@@ -1,5 +1,25 @@
-
 services:
+  php:
+    image: marca-page-php
+    build:
+      context: .
+      target: frankenphp_dev
+    restart: unless-stopped
+    environment:
+      SERVER_NAME: ${SERVER_NAME:-http://localhost}, php:80
+      DATABASE_URL: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-!ChangeMe!}@database:5432/${POSTGRES_DB:-app}?serverVersion=${POSTGRES_VERSION:-16}&charset=utf8
+      MAILER_DSN: smtp://mailer:1025
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    ports:
+      - "8080:80"
+      - "8443:443"
+      - "8443:443/udp"
+    depends_on:
+      database:
+        condition: service_healthy
+
 ###> doctrine/doctrine-bundle ###
   database:
     image: postgres:${POSTGRES_VERSION:-16}-alpine
@@ -20,6 +40,8 @@ services:
 ###< doctrine/doctrine-bundle ###
 
 volumes:
+  caddy_data:
+  caddy_config:
 ###> doctrine/doctrine-bundle ###
   database_data:
 ###< doctrine/doctrine-bundle ###
