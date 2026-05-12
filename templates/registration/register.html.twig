@@ -1,0 +1,162 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer mon coffret · Marca-Page{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block flashes %}{% endblock %}
+
+{% block body %}
+<div class="container-fluid min-vh-100 d-flex flex-column">
+
+    <header class="d-flex justify-content-between align-items-center py-4 px-2 px-md-4">
+        <a class="d-flex align-items-center gap-2 text-decoration-none text-ink" href="{{ path('app_home') }}">
+            <span class="brand-mark">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#3A2A33" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12v17l-6-4-6 4v-17z"/></svg>
+            </span>
+            <span class="font-serif fs-4 fw-semibold">Marca-Page</span>
+        </a>
+        <a href="{{ path('app_login') }}" class="btn btn-link fw-medium small">
+            Déjà un coffret ? <span class="ms-1 text-ink fw-semibold">Se connecter</span>
+        </a>
+    </header>
+
+    <main class="flex-grow-1 d-flex align-items-center px-2 px-md-4 py-3">
+        <div class="container">
+            <div class="row align-items-center g-4 g-lg-5">
+
+                <div class="col-lg-6">
+                    <div class="px-lg-4">
+                        <div class="d-flex align-items-center gap-2 mb-4">
+                            <span class="step-dot active">1</span>
+                            <span class="step-bar active"></span>
+                            <span class="step-dot">2</span>
+                            <span class="step-bar"></span>
+                            <span class="step-dot">3</span>
+                            <small class="text-mute ms-2">Étape 1 sur 3</small>
+                        </div>
+
+                        <small class="text-mute text-uppercase fw-semibold eyebrow">Nouveau coffret</small>
+                        <h1 class="font-serif display-5 fw-semibold mt-2 mb-3">Commençons votre <em class="fst-italic text-primary">rayon</em>.</h1>
+                        <p class="text-mute fs-5 mb-4">Quelques informations, et votre bibliothèque vous attend.</p>
+
+                        {{ form_start(registrationForm, {attr: {class: 'd-flex flex-column gap-3', novalidate: 'novalidate'}}) }}
+                            <div class="form-floating">
+                                {{ form_widget(registrationForm.displayName, {attr: {class: 'form-control', placeholder: 'Votre prénom'}}) }}
+                                {{ form_label(registrationForm.displayName, null, {label_attr: {for: registrationForm.displayName.vars.id}}) }}
+                                {{ form_errors(registrationForm.displayName) }}
+                            </div>
+
+                            <div class="form-floating">
+                                {{ form_widget(registrationForm.email, {attr: {class: 'form-control', placeholder: 'Adresse email'}}) }}
+                                {{ form_label(registrationForm.email) }}
+                                {{ form_errors(registrationForm.email) }}
+                            </div>
+
+                            <div data-controller="password-strength">
+                                <div class="form-floating">
+                                    {{ form_widget(registrationForm.plainPassword.first, {attr: {class: 'form-control', placeholder: 'Mot de passe', 'data-password-strength-target': 'input', 'data-action': 'input->password-strength#evaluate'}}) }}
+                                    {{ form_label(registrationForm.plainPassword.first) }}
+                                </div>
+                                <div class="strength" data-password-strength-target="bar"><span></span><span></span><span></span><span></span></div>
+                                <div class="d-flex justify-content-between mt-2">
+                                    <small class="text-mute">8 caractères minimum, une majuscule, un chiffre.</small>
+                                    <small class="fw-medium text-mute" data-password-strength-target="label">—</small>
+                                </div>
+                                {{ form_errors(registrationForm.plainPassword.first) }}
+                            </div>
+
+                            <div class="form-floating">
+                                {{ form_widget(registrationForm.plainPassword.second, {attr: {class: 'form-control', placeholder: 'Confirmation'}}) }}
+                                {{ form_label(registrationForm.plainPassword.second) }}
+                                {{ form_errors(registrationForm.plainPassword.second) }}
+                            </div>
+
+                            <label class="form-check d-flex align-items-start gap-2 mt-2 mb-0">
+                                {{ form_widget(registrationForm.agreeTerms, {attr: {class: 'form-check-input mt-1'}}) }}
+                                <span class="small text-mute">
+                                    J'accepte les <a href="#" class="text-ink fw-medium underline-rose">conditions d'utilisation</a>
+                                    et la <a href="#" class="text-ink fw-medium underline-rose">politique de confidentialité</a>. Aucune donnée ne sera revendue.
+                                </span>
+                            </label>
+                            {{ form_errors(registrationForm.agreeTerms) }}
+
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-medium py-3 mt-2">
+                                Créer mon coffret <i class="bi bi-arrow-right ms-1"></i>
+                            </button>
+
+                            <div class="d-flex align-items-center gap-3 my-2">
+                                <hr class="flex-grow-1">
+                                <small class="text-mute">ou</small>
+                                <hr class="flex-grow-1">
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-outline-primary rounded-pill fw-medium d-inline-flex justify-content-center align-items-center gap-2 py-2">
+                                    <i class="bi bi-google"></i> Continuer avec Google
+                                </button>
+                                <button type="button" class="btn btn-outline-primary rounded-pill fw-medium d-inline-flex justify-content-center align-items-center gap-2 py-2">
+                                    <i class="bi bi-apple fs-5"></i> Continuer avec Apple
+                                </button>
+                            </div>
+                        {{ form_end(registrationForm) }}
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="illus-panel illus-panel--signup">
+                        <div class="blob blob--soft auth-blob--3"></div>
+                        <div class="blob blob--soft auth-blob--4"></div>
+
+                        <div class="illus-stage illus-stage--signup">
+                            <div class="cover float-a auth-cover auth-cover--signup-1 cover--theme-0">
+                                <span class="spine"></span>
+                                <div class="deco"></div>
+                                <div class="body"><div class="author-c">V. Hugo</div><div><div class="title-c fs-4 mb-1">Notre-Dame de Paris</div><div class="pub">1831</div></div></div>
+                            </div>
+                            <div class="cover float-b auth-cover auth-cover--signup-2 cover--theme-3">
+                                <span class="spine"></span>
+                                <div class="deco"></div>
+                                <div class="body"><div class="author-c">A. Ernaux</div><div><div class="title-c fs-4 mb-1">Les Années</div><div class="pub">2008</div></div></div>
+                            </div>
+                            <div class="cover float-c auth-cover auth-cover--signup-3 cover--theme-1">
+                                <span class="spine"></span>
+                                <div class="deco"></div>
+                                <div class="body"><div class="author-c">Saint-Exupéry</div><div><div class="title-c fs-4 mb-1">Le Petit Prince</div><div class="pub">1943</div></div></div>
+                            </div>
+
+                            <div class="feature-list">
+                                <div class="feature-row">
+                                    <span class="ico"><i class="bi bi-upc-scan"></i></span>
+                                    <div>
+                                        <div class="fw-semibold small">Cataloguez depuis Google Books</div>
+                                        <small class="text-mute">Cherchez un titre, on récupère les métadonnées.</small>
+                                    </div>
+                                </div>
+                                <div class="feature-row">
+                                    <span class="ico"><i class="bi bi-bookmark-heart"></i></span>
+                                    <div>
+                                        <div class="fw-semibold small">Vos notes restent privées</div>
+                                        <small class="text-mute">Annotations, citations, rappels — pour vous seul.</small>
+                                    </div>
+                                </div>
+                                <div class="feature-row">
+                                    <span class="ico"><i class="bi bi-shield-lock"></i></span>
+                                    <div>
+                                        <div class="fw-semibold small">Sans pub, sans algorithme</div>
+                                        <small class="text-mute">Vos données restent chez vous. Promis.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="px-2 px-md-4 py-3">
+        <small class="text-mute">© {{ "now"|date("Y") }} Marca-Page · Fait avec soin.</small>
+    </footer>
+</div>
+{% endblock %}

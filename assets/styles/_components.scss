@@ -64,6 +64,16 @@
   &::-webkit-scrollbar-thumb { background: var(--rose-powder); border-radius: 999px; }
 }
 
+// Brand-coloured checkboxes / radios everywhere
+.form-check-input {
+  border-color: #E8D7DF;
+
+  &:checked {
+    background-color: #E89BB8;
+    border-color: #E89BB8;
+  }
+}
+
 // Footer
 .site-footer {
   background: #fff;

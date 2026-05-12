@@ -32,6 +32,12 @@ body {
   font-weight: 600;
 }
 
+// Soft-rose underline used on inline emphasis links.
+.underline-rose {
+  border-bottom: 2px solid var(--rose-soft) !important;
+  text-decoration: none;
+}
+
 // Decorative title rule used on the book detail page (was an inline-styled div).
 .title-rule {
   height: 2px;

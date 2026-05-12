@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ book.title }} · Marca-Page{% endblock %}
+{% block navbar %}{% include '_partials/navbar_app.html.twig' %}{% endblock %}
+{% block footer %}{% include '_partials/footer_compact.html.twig' %}{% endblock %}
+
+{% block body %}
+    <div class="container py-5">
+        <h1 class="font-serif display-5 fw-semibold">{{ book.title }}</h1>
+        <p class="text-mute">{{ book.authorsLine }}</p>
+        <p class="text-mute">Détail du livre — à finaliser.</p>
+    </div>
+{% endblock %}

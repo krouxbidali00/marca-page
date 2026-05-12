@@ -1,0 +1,135 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Se connecter · Marca-Page{% endblock %}
+{% block navbar %}{% endblock %}
+{% block footer %}{% endblock %}
+{% block flashes %}{% endblock %}
+
+{% block body %}
+<div class="container-fluid min-vh-100 d-flex flex-column">
+
+    <header class="d-flex justify-content-between align-items-center py-4 px-2 px-md-4">
+        <a class="d-flex align-items-center gap-2 text-decoration-none text-ink" href="{{ path('app_home') }}">
+            <span class="brand-mark">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#3A2A33" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12v17l-6-4-6 4v-17z"/></svg>
+            </span>
+            <span class="font-serif fs-4 fw-semibold">Marca-Page</span>
+        </a>
+        <a href="{{ path('app_register') }}" class="btn btn-link fw-medium small">
+            Première fois ici ? <span class="ms-1 text-ink fw-semibold">Créer mon coffret</span>
+        </a>
+    </header>
+
+    <main class="flex-grow-1 d-flex align-items-center px-2 px-md-4 py-3">
+        <div class="container">
+            <div class="row align-items-center g-4 g-lg-5">
+
+                <div class="col-lg-6 order-2 order-lg-1">
+                    <div class="illus-panel illus-panel--login">
+                        <div class="blob blob--soft auth-blob--1"></div>
+                        <div class="blob blob--soft auth-blob--2"></div>
+
+                        <div class="illus-stage illus-stage--login">
+                            <div class="cover float-a auth-cover auth-cover--login-1 cover--theme-0">
+                                <span class="spine"></span>
+                                <div class="deco"></div>
+                                <div class="body">
+                                    <div class="author-c">A. Camus</div>
+                                    <div><div class="title-c fs-4 mb-1">L'Étranger</div><div class="pub">1942</div></div>
+                                </div>
+                            </div>
+
+                            <div class="cover float-b auth-cover auth-cover--login-2 cover--theme-1">
+                                <span class="spine"></span>
+                                <div class="deco"></div>
+                                <div class="body">
+                                    <div class="author-c">Saint-Exupéry</div>
+                                    <div><div class="title-c fs-4 mb-1">Le Petit Prince</div><div class="pub">1943</div></div>
+                                </div>
+                            </div>
+
+                            <div class="teacup-spot"><div class="teacup"></div></div>
+
+                            <div class="quote-c quote-c--placed">
+                                <div class="d-flex align-items-start gap-3">
+                                    <i class="bi bi-quote display-6 lh-1 text-mute" aria-hidden="true"></i>
+                                    <div>
+                                        <p class="font-serif fs-5 mb-1">Une bibliothèque est une chambre d'amis.</p>
+                                        <small class="text-mute">Daniel Pennac</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 order-1 order-lg-2">
+                    <div class="px-lg-5">
+                        <small class="text-mute text-uppercase fw-semibold eyebrow">Bon retour</small>
+                        <h1 class="font-serif display-5 fw-semibold mt-2 mb-3">Reprenons là où <em class="fst-italic text-primary">vous l'aviez laissé</em>.</h1>
+                        <p class="text-mute fs-5 mb-4">Connectez-vous pour retrouver votre rayon.</p>
+
+                        {% if error %}
+                            <div class="alert alert-danger rounded-4 border-0">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                        {% endif %}
+
+                        <form method="post" action="{{ path('app_login') }}" class="d-flex flex-column gap-3">
+                            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                            <div class="form-floating">
+                                <input type="email" class="form-control" id="inputEmail" name="_username" value="{{ last_username }}" placeholder="Votre adresse email" required autofocus>
+                                <label for="inputEmail"><i class="bi bi-envelope me-1"></i> Adresse email</label>
+                            </div>
+
+                            <div class="form-floating position-relative" data-controller="password-toggle">
+                                <input type="password" class="form-control" id="inputPassword" name="_password" placeholder="Mot de passe" required data-password-toggle-target="input">
+                                <label for="inputPassword"><i class="bi bi-lock me-1"></i> Mot de passe</label>
+                                <button type="button" class="btn btn-link position-absolute end-0 top-50 translate-middle-y me-2 text-mute" aria-label="Afficher le mot de passe" data-action="password-toggle#toggle">
+                                    <i class="bi bi-eye" data-password-toggle-target="icon"></i>
+                                </button>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center my-1">
+                                <label class="form-check d-flex align-items-center gap-2 mb-0">
+                                    <input type="checkbox" class="form-check-input" name="_remember_me" checked>
+                                    <span class="small">Rester connecté sur cet appareil</span>
+                                </label>
+                                <a href="#" class="small text-decoration-none fw-medium text-primary">Mot de passe oublié&nbsp;?</a>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-medium py-3 mt-2">
+                                Ouvrir ma bibliothèque <i class="bi bi-arrow-right ms-1"></i>
+                            </button>
+
+                            <div class="d-flex align-items-center gap-3 my-2">
+                                <hr class="flex-grow-1">
+                                <small class="text-mute">ou</small>
+                                <hr class="flex-grow-1">
+                            </div>
+
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-outline-primary btn-lg rounded-pill fw-medium d-inline-flex justify-content-center align-items-center gap-2">
+                                    <i class="bi bi-google"></i> Continuer avec Google
+                                </button>
+                                <button type="button" class="btn btn-outline-primary btn-lg rounded-pill fw-medium d-inline-flex justify-content-center align-items-center gap-2">
+                                    <i class="bi bi-apple fs-5"></i> Continuer avec Apple
+                                </button>
+                            </div>
+                        </form>
+
+                        <p class="text-mute small mt-4 mb-0">
+                            <i class="bi bi-shield-lock me-1"></i>
+                            Vos données restent sur votre instance. Nous ne partageons rien, jamais.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="px-2 px-md-4 py-3">
+        <small class="text-mute">© {{ "now"|date("Y") }} Marca-Page · Fait avec soin.</small>
+    </footer>
+</div>
+{% endblock %}
