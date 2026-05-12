@@ -1,0 +1,39 @@
+{% set route = app.request.attributes.get('_route') %}
+<nav class="navbar navbar-expand-lg navbar-mr sticky-top">
+    <div class="container py-2">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="{{ path('app_home') }}">
+            <span class="brand-mark">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#3A2A33" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12v17l-6-4-6 4v-17z"/></svg>
+            </span>
+            <span class="font-serif fs-4 fw-semibold">Marca-Page</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-label="Menu">
+            <i class="bi bi-list fs-3"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav mx-lg-auto gap-lg-4 mt-3 mt-lg-0">
+                <li class="nav-item"><a class="nav-link {{ route == 'app_home' ? 'active' }}" href="{{ path('app_home') }}">Accueil</a></li>
+                <li class="nav-item"><a class="nav-link {{ route starts with 'app_library' or route starts with 'app_book' ? 'active' }}" href="{{ path('app_library') }}">Bibliothèque</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Étagères</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Statistiques</a></li>
+            </ul>
+            <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+                <a href="{{ path('app_book_search') }}" class="btn btn-primary rounded-pill px-3 d-inline-flex align-items-center gap-2"><i class="bi bi-plus-lg"></i> Ajouter un livre</a>
+                <div class="dropdown">
+                    <button class="btn btn-soft rounded-pill d-flex align-items-center gap-2 px-3" data-bs-toggle="dropdown">
+                        <span class="avatar avatar--sm avatar--lavande">{{ app.user ? app.user.initial : '?' }}</span>
+                        <span class="fw-medium d-none d-sm-inline">{{ app.user ? app.user.displayName : '' }}</span>
+                        <i class="bi bi-chevron-down small"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm rounded-4 border-0 mt-2 p-2">
+                        <li><a class="dropdown-item rounded-3 py-2" href="#"><i class="bi bi-person me-2"></i> Mon profil</a></li>
+                        <li><a class="dropdown-item rounded-3 py-2" href="{{ path('app_library') }}"><i class="bi bi-book me-2"></i> Ma bibliothèque</a></li>
+                        <li><a class="dropdown-item rounded-3 py-2" href="#"><i class="bi bi-gear me-2"></i> Paramètres</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item rounded-3 py-2" href="{{ path('app_logout') }}"><i class="bi bi-box-arrow-right me-2"></i> Se déconnecter</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>

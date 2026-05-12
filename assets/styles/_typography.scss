@@ -1,0 +1,41 @@
+html,
+body {
+  background: var(--cream);
+  color: var(--ink);
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-serif {
+  font-family: 'Fraunces', Georgia, serif;
+  font-optical-sizing: auto;
+  letter-spacing: -.01em;
+}
+
+.text-mute {
+  color: var(--mute) !important;
+}
+
+.text-ink {
+  color: var(--ink) !important;
+}
+
+.eyebrow {
+  font-family: 'Inter', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  font-size: .75rem;
+  color: var(--mute);
+  font-weight: 600;
+}
+
+// Decorative title rule used on the book detail page (was an inline-styled div).
+.title-rule {
+  height: 2px;
+  width: 64px;
+  background: #E89BB8;
+  margin: 14px 0;
+}

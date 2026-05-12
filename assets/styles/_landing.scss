@@ -1,0 +1,79 @@
+// Section spacing
+.section {
+  padding: 7rem 0;
+
+  @media (max-width: 767.98px) { padding: 4rem 0; }
+}
+
+// Floating animation shared by hero / auth covers
+@keyframes floata {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -10px; }
+}
+.float-a { animation: floata 7s ease-in-out infinite; }
+.float-b { animation: floata 9s ease-in-out infinite -2s; }
+.float-c { animation: floata 8s ease-in-out infinite -4s; }
+
+// Hero blobs
+.blob--a { top: -120px; left: -140px; width: 520px; height: 520px; background: #FCE4EC; }
+.blob--b { top: 140px; right: -120px; width: 480px; height: 480px; background: #E0D4F7; }
+
+// Hero stack of floating book covers
+.hero-stack {
+  position: relative;
+  height: 460px;
+
+  @media (max-width: 991.98px) { height: 380px; }
+
+  .cover {
+    position: absolute;
+    transition: transform .4s ease;
+  }
+  .cover:hover {
+    transform: translateY(-6px) rotate(0deg) !important;
+  }
+}
+
+.hero-cover--1 { width: 200px; height: 280px; left: 8%; top: 18%; transform: rotate(-8deg); }
+.hero-cover--2 { width: 210px; height: 300px; left: 38%; top: 6%; transform: rotate(4deg); }
+.hero-cover--3 { width: 195px; height: 275px; right: 6%; top: 32%; transform: rotate(9deg); }
+
+// Decorative cards layered over the hero stack
+.hero-badge {
+  position: absolute;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: var(--bs-box-shadow-sm);
+}
+.hero-badge--reading {
+  left: 0;
+  bottom: 6%;
+  max-width: 280px;
+  padding: .75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+.hero-badge--rating {
+  right: 0;
+  bottom: 18%;
+  padding: .5rem .75rem;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+.hero-progress {
+  height: 6px;
+  width: 140px;
+  background: #F3E3EA;
+
+  .progress-bar { background: #E89BB8; }
+}
+
+// CTA section
+.cta-card {
+  background: linear-gradient(180deg, #FCE4EC 0%, #FFF1F6 100%);
+}
+.cta-cover--1 { width: 120px; height: 170px; transform: rotate(-6deg); }
+.cta-cover--2 { width: 130px; height: 190px; }
+.cta-cover--3 { width: 120px; height: 170px; transform: rotate(6deg); }

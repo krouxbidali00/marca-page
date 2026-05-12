@@ -1,0 +1,132 @@
+// Search input (library + book search)
+.search-input {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: .85rem 1.25rem .85rem 3rem;
+  font-size: 1.05rem;
+  box-shadow: var(--bs-box-shadow-sm);
+  width: 100%;
+
+  &:focus {
+    outline: none;
+    border-color: #E89BB8;
+    box-shadow: 0 0 0 4px rgba(232, 155, 184, .18);
+  }
+}
+
+.search-wrap {
+  position: relative;
+  max-width: 640px;
+  margin: 0 auto;
+
+  > i {
+    position: absolute;
+    left: 1.1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--mute);
+    font-size: 1.15rem;
+  }
+
+  kbd {
+    position: absolute;
+    right: .9rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #FCE4EC;
+    color: #8A3A5C;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: .7rem;
+    padding: .2rem .5rem;
+    border-radius: 6px;
+  }
+}
+
+// Filter sidebar
+.filter-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  padding: 1.25rem;
+
+  h6 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  &.filter-card--tip {
+    background: linear-gradient(180deg, #FCE4EC 0%, #FFF1F6 100%);
+    border-color: transparent;
+  }
+}
+
+.filter-label {
+  text-transform: uppercase;
+  color: var(--mute);
+  font-weight: 600;
+  font-size: .72rem;
+  letter-spacing: .14em;
+}
+
+.filter-check {
+  .form-check-input {
+    width: 1.1em;
+    height: 1.1em;
+    margin-top: .15em;
+    border: 1.5px solid #E8D7DF;
+    border-radius: 5px;
+  }
+  .form-check-input:checked {
+    background-color: #E89BB8;
+    border-color: #E89BB8;
+  }
+  label { font-size: .92rem; }
+}
+
+.filter-count {
+  color: var(--mute);
+  font-size: .8rem;
+}
+
+// Inline keyboard hint
+.kbd-inline {
+  background: #fff;
+  padding: .1rem .35rem;
+  border-radius: 4px;
+}
+
+// Sort button
+.sort-btn {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: .55rem 1rem;
+  font-weight: 500;
+
+  &:hover { border-color: #E89BB8; }
+}
+
+// View toggle (grid / list / shelf)
+.view-toggle {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px;
+  display: inline-flex;
+
+  button {
+    border: 0;
+    background: transparent;
+    padding: .45rem .8rem;
+    border-radius: 999px;
+    color: var(--mute);
+
+    &.active {
+      background: #FCE4EC;
+      color: var(--ink);
+    }
+  }
+}

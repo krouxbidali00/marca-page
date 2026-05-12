@@ -1,0 +1,175 @@
+// Form fields (used on auth pages and elsewhere)
+.form-control {
+  border: 1.5px solid var(--line);
+  border-radius: 1rem;
+  background: #fff;
+
+  &:focus {
+    border-color: #E89BB8;
+    box-shadow: 0 0 0 4px rgba(232, 155, 184, .18);
+  }
+}
+.form-floating > label { color: var(--mute); }
+
+// Illustration panel
+.illus-panel {
+  border-radius: 2rem;
+  padding: 3rem;
+  position: relative;
+  overflow: hidden;
+  min-height: 560px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(rgba(216, 140, 170, .10) 1px, transparent 1px);
+    background-size: 22px 22px;
+    opacity: .7;
+  }
+}
+.illus-panel--login { background: linear-gradient(160deg, #FCE4EC 0%, #FFF9FB 60%, #E0D4F7 100%); }
+.illus-panel--signup { background: linear-gradient(160deg, #E0D4F7 0%, #FFF9FB 50%, #FCE4EC 100%); min-height: 680px; }
+
+.illus-stage {
+  position: relative;
+}
+.illus-stage--login { min-height: 440px; }
+.illus-stage--signup { min-height: 580px; }
+
+.auth-blob--1 { top: 20%; left: 10%; width: 260px; height: 260px; background: #F8C8DC; }
+.auth-blob--2 { bottom: 10%; right: 5%; width: 240px; height: 240px; background: #E0D4F7; }
+.auth-blob--3 { top: 10%; right: 10%; width: 280px; height: 280px; background: #F8C8DC; }
+.auth-blob--4 { bottom: 5%; left: 5%; width: 260px; height: 260px; background: #E0D4F7; }
+
+// Floating covers on the auth pages (absolute, sized, rotated — no inline styles)
+.auth-cover {
+  position: absolute;
+
+  &--login-1 { width: 160px; height: 230px; left: 8%; top: 8%; transform: rotate(-7deg); }
+  &--login-2 { width: 170px; height: 245px; right: 8%; top: 18%; transform: rotate(6deg); }
+  &--signup-1 { width: 150px; height: 215px; left: 10%; top: 4%; transform: rotate(-9deg); }
+  &--signup-2 { width: 160px; height: 230px; right: 8%; top: 10%; transform: rotate(7deg); }
+  &--signup-3 { width: 155px; height: 220px; left: 36%; top: 28%; transform: rotate(2deg); }
+}
+
+// Teacup illustration
+.teacup-spot { position: absolute; left: 38%; bottom: 18%; }
+.teacup {
+  width: 120px;
+  height: 120px;
+  background: #fff;
+  border-radius: 30% 30% 50% 50% / 30% 30% 60% 60%;
+  position: relative;
+  box-shadow: var(--bs-box-shadow-sm);
+
+  &::before {
+    content: '';
+    position: absolute;
+    right: -22px;
+    top: 30px;
+    width: 32px;
+    height: 32px;
+    border: 6px solid #fff;
+    border-radius: 50%;
+    border-left-color: transparent;
+    border-bottom-color: transparent;
+    transform: rotate(40deg);
+  }
+  &::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: -4px;
+    transform: translateX(-50%);
+    width: 36px;
+    height: 18px;
+    border-radius: 50% 50% 0 0;
+    border: 2px solid #E89BB8;
+    border-bottom: 0;
+    opacity: .5;
+  }
+}
+
+// Quote card over the illustration
+.quote-c {
+  background: rgba(255, 255, 255, .7);
+  backdrop-filter: blur(6px);
+  border-radius: 1.25rem;
+  padding: 1rem 1.25rem;
+}
+.quote-c--placed { position: absolute; bottom: 4%; left: 6%; right: 6%; }
+
+// Signup step indicator
+.step-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: .75rem;
+  font-weight: 600;
+  background: #F3E3EA;
+  color: var(--mute);
+
+  &.active { background: #F8C8DC; color: #3A2A33; }
+}
+.step-bar {
+  height: 2px;
+  background: #F3E3EA;
+  flex: 1;
+
+  &.active { background: #F8C8DC; }
+}
+
+// Password strength meter
+.strength {
+  display: flex;
+  gap: 6px;
+  margin-top: .6rem;
+
+  span {
+    flex: 1;
+    height: 6px;
+    border-radius: 999px;
+    background: #F3E3EA;
+    transition: background .2s;
+  }
+
+  &.s1 span:nth-child(-n+1) { background: #E89BB8; }
+  &.s2 span:nth-child(-n+2) { background: #E89BB8; }
+  &.s3 span:nth-child(-n+3) { background: #C8E6D0; }
+  &.s4 span { background: #7AB58E; }
+}
+
+// Signup feature list
+.feature-list {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  bottom: 4%;
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+}
+.feature-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: rgba(255, 255, 255, .7);
+  backdrop-filter: blur(6px);
+  border-radius: 1rem;
+  padding: .9rem 1rem;
+
+  .ico {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: #FCE4EC;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+
+    i { color: #E89BB8; font-size: 1.1rem; }
+  }
+}

@@ -1,0 +1,87 @@
+// "Floor" shadow under the big cover on the detail page.
+.cover-stage {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -22px;
+    transform: translateX(-50%);
+    width: 78%;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(58, 42, 51, .18);
+    filter: blur(14px);
+    z-index: -1;
+  }
+}
+
+// Editable personal notes area
+.note-area {
+  background: #FFFCFD;
+  border: 1.5px dashed #F3C8DA;
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  min-height: 180px;
+  transition: border-color .2s, background .2s;
+
+  &:hover { border-color: #E89BB8; }
+  &:focus-within { border-color: #E89BB8; background: #fff; }
+
+  .form-control {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    resize: none;
+
+    &:focus { box-shadow: none; }
+  }
+}
+
+// Quote callout
+.quote-callout {
+  background: #FCE4EC;
+  border-radius: 1.5rem;
+  padding: 1.5rem 1.75rem;
+  position: relative;
+
+  .quote-mark {
+    position: absolute;
+    top: -8px;
+    left: 16px;
+    color: #E89BB8;
+    font-family: 'Fraunces', serif;
+    font-size: 4rem;
+    line-height: 1;
+  }
+}
+
+// Detail-page tabs
+.nav-pills .nav-link {
+  color: var(--mute);
+  font-weight: 500;
+  border-radius: 999px;
+  padding: .5rem 1rem;
+
+  &.active {
+    background: #FCE4EC;
+    color: var(--ink);
+  }
+}
+
+.action-row .btn {
+  padding-top: .85rem;
+  padding-bottom: .85rem;
+}
+
+// State applied to the "marquer comme lu / acheté" buttons once active.
+.btn.is-active {
+  background: #C8E6D0;
+  border-color: #C8E6D0;
+  color: #2E5C3E;
+}
+
+@media (min-width: 992px) {
+  .sticky-cover { position: sticky; top: 100px; }
+}

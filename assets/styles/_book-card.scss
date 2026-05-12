@@ -1,0 +1,39 @@
+.book-card {
+  transition: transform .25s ease, box-shadow .25s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+
+  &:hover .cover {
+    box-shadow:
+      0 24px 40px -14px rgba(58, 42, 51, .34),
+      0 8px 14px -6px rgba(58, 42, 51, .20);
+  }
+}
+
+// Horizontal "similar book" card on the detail page.
+.sim-card {
+  transition: transform .2s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+  }
+}
+
+// Library view modes (toggled by the view-toggle Stimulus controller).
+.view--list .book-card {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+
+  .cover {
+    flex: 0 0 80px;
+    width: 80px;
+  }
+}
+
+.view--shelf .book-card {
+  // Compact "spine on a shelf" feel — narrower covers, tighter rows.
+  .cover { aspect-ratio: 1 / 1.7; }
+}

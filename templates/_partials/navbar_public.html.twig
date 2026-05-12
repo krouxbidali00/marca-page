@@ -1,0 +1,25 @@
+<nav class="navbar navbar-expand-lg navbar-mr sticky-top">
+    <div class="container py-2">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="{{ path('app_home') }}">
+            <span class="brand-mark">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#3A2A33" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12v17l-6-4-6 4v-17z"/></svg>
+            </span>
+            <span class="font-serif fs-4 fw-semibold">Marca-Page</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-label="Menu">
+            <i class="bi bi-list fs-3"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav mx-lg-auto gap-lg-4 mt-3 mt-lg-0">
+                <li class="nav-item"><a class="nav-link {{ app.request.attributes.get('_route') == 'app_home' ? 'active' }}" href="{{ path('app_home') }}">Accueil</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ path('app_library') }}">Bibliothèque</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ path('app_home') }}#decouvrir">Découvrir</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ path('app_home') }}#tarifs">Tarifs</a></li>
+            </ul>
+            <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+                <a href="{{ path('app_login') }}" class="btn btn-link fw-medium">Se connecter</a>
+                <a href="{{ path('app_register') }}" class="btn btn-primary rounded-pill px-4">Créer un compte</a>
+            </div>
+        </div>
+    </div>
+</nav>

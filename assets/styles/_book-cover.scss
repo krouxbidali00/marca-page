@@ -1,0 +1,162 @@
+// CSS-generated book covers (used as a fallback when no Google Books thumbnail).
+// Per-book colours come from one of 12 theme classes — never from inline styles.
+
+@use 'sass:map';
+
+.cover {
+  position: relative;
+  border-radius: 4px 12px 12px 4px;
+  overflow: hidden;
+  box-shadow:
+    0 18px 30px -12px rgba(58, 42, 51, .28),
+    0 6px 10px -6px rgba(58, 42, 51, .18);
+  background: #fff;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  isolation: isolate;
+
+  .spine {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 10px;
+    background: linear-gradient(90deg, rgba(0, 0, 0, .22), rgba(255, 255, 255, .18) 60%, rgba(0, 0, 0, .05));
+    z-index: 2;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(0, 0, 0, .16) 0, rgba(0, 0, 0, 0) 14%, rgba(255, 255, 255, .06) 50%, rgba(0, 0, 0, .10) 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .deco {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  .body {
+    position: relative;
+    z-index: 0;
+    padding: 18px 14px 14px 22px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .title-c {
+    font-family: 'Fraunces', Georgia, serif;
+    line-height: 1.05;
+    font-weight: 600;
+    font-size: 1.5rem;
+  }
+
+  .author-c {
+    font-family: 'Inter', sans-serif;
+    font-size: .65rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    opacity: .88;
+  }
+
+  .pub {
+    font-family: 'Inter', sans-serif;
+    font-size: .6rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    opacity: .7;
+  }
+}
+
+.cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+// --- size variants ---------------------------------------------------------
+.cover--lg {
+  aspect-ratio: 2 / 3;
+}
+
+.cover--hero {
+  aspect-ratio: 2 / 3;
+  width: 100%;
+  max-width: 340px;
+  border-radius: 4px 14px 14px 4px;
+  box-shadow:
+    0 32px 50px -18px rgba(58, 42, 51, .40),
+    0 12px 18px -10px rgba(58, 42, 51, .22);
+
+  .spine { width: 14px; }
+  .body { padding: 28px 24px 24px 32px; }
+  .title-c { font-size: 2.6rem; }
+  .author-c { font-size: .78rem; letter-spacing: .18em; opacity: .9; }
+  .pub { font-size: .65rem; letter-spacing: .22em; }
+}
+
+.cover--md {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+
+  .title-c { font-size: 1.75rem; }
+}
+
+.cover--sm {
+  width: 120px;
+  height: 170px;
+
+  .body { padding: 12px 10px 10px 16px; }
+  .title-c { font-size: 1.1rem; line-height: 1; }
+  .author-c { font-size: .55rem; }
+}
+
+.cover--xs {
+  width: 90px;
+  height: 130px;
+  flex-shrink: 0;
+
+  .body { padding: 10px 8px 8px 14px; }
+  .title-c { font-size: .95rem; }
+  .author-c { font-size: .55rem; }
+  .pub { font-size: .5rem; }
+}
+
+// --- colour themes (12) ----------------------------------------------------
+// Map: index => (bg: <dark base>, deco: <gradient>, light: <bool — dark body text>)
+$cover-themes: (
+  0:  (bg: #3A2A33, deco: (radial-gradient(circle at 70% 25%, rgba(232, 155, 184, .35), transparent 60%), linear-gradient(180deg, #3A2A33, #5A3A4A)), light: false),
+  1:  (bg: #E0D4F7, deco: (linear-gradient(180deg, #E0D4F7, #C9B9EB)), light: true),
+  2:  (bg: #8A3A5C, deco: (radial-gradient(circle at 50% 20%, rgba(255, 229, 180, .25), transparent 60%), linear-gradient(180deg, #8A3A5C, #6B2A48)), light: false),
+  3:  (bg: #2E5C3E, deco: (radial-gradient(circle at 30% 80%, rgba(200, 230, 208, .35), transparent 60%), linear-gradient(180deg, #2E5C3E, #1E4A2E)), light: false),
+  4:  (bg: #FFE5B4, deco: (linear-gradient(180deg, #FFE5B4, #F5C97D)), light: true),
+  5:  (bg: #4A3C7A, deco: (radial-gradient(circle at 70% 20%, rgba(224, 212, 247, .4), transparent 60%), linear-gradient(180deg, #4A3C7A, #332A5A)), light: false),
+  6:  (bg: #7A4A3A, deco: (linear-gradient(180deg, #7A4A3A, #5A3322)), light: false),
+  7:  (bg: #1E3A5F, deco: (linear-gradient(180deg, #1E3A5F, #0F2540)), light: false),
+  8:  (bg: #5C2E2E, deco: (linear-gradient(180deg, #5C2E2E, #3D1E1E)), light: false),
+  9:  (bg: #F8C8DC, deco: (linear-gradient(180deg, #F8C8DC, #E89BB8)), light: true),
+  10: (bg: #2A4A3E, deco: (linear-gradient(180deg, #2A4A3E, #1A2F28)), light: false),
+  11: (bg: #C8E6D0, deco: (linear-gradient(180deg, #C8E6D0, #9DC8AB)), light: true),
+);
+
+@each $i, $t in $cover-themes {
+  .cover--theme-#{$i} {
+    background: map-get($t, bg);
+
+    .deco { background: map-get($t, deco); }
+
+    @if map-get($t, light) {
+      .body { color: #3A2A33; }
+      .author-c,
+      .pub { opacity: .7; }
+    }
+  }
+}

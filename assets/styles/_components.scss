@@ -1,0 +1,104 @@
+// Stars
+.stars i { color: #E89BB8; }
+.stars .bi-star { color: #E8D7DF; }
+.stars--sm i { font-size: .95rem; }
+
+// Avatars
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  color: #3A2A33;
+  font-size: .95rem;
+  background: var(--rose-powder);
+
+  &.avatar--sm { width: 28px; height: 28px; font-size: .8rem; }
+  &.avatar--lg { width: 56px; height: 56px; font-size: 1.4rem; }
+  &.avatar--lavande { background: #E0D4F7; }
+  &.avatar--rose { background: #FCE4EC; }
+}
+
+// Subtle dotted grain backdrop
+.grain {
+  background-image: radial-gradient(rgba(216, 140, 170, .07) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+// Decorative blurred blobs
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: .7;
+  pointer-events: none;
+
+  &.blob--soft { filter: blur(60px); opacity: .55; }
+}
+
+// Numbered step circle ("how it works")
+.step-num {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+}
+.step-num--1 { background: #FCE4EC; }
+.step-num--2 { background: #E0D4F7; }
+.step-num--3 { background: #C8E6D0; }
+
+// Horizontal scroll-snap carousel
+.scroll-row {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+
+  > * { scroll-snap-align: start; }
+
+  &::-webkit-scrollbar { height: 6px; }
+  &::-webkit-scrollbar-thumb { background: var(--rose-powder); border-radius: 999px; }
+}
+
+// Footer
+.site-footer {
+  background: #fff;
+
+  hr { border-color: var(--line); }
+}
+.footer-blurb { max-width: 360px; }
+
+// Round icon button (social links, share buttons, pager arrows)
+.btn-circle {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+
+  &.btn-circle--md { width: 42px; height: 42px; }
+}
+
+// Pagination — round page links.
+.pagination .page-link {
+  border: 0;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--ink);
+  background: transparent;
+}
+.pagination .page-item.active .page-link {
+  background: #F8C8DC;
+  color: #3A2A33;
+}
+.pagination .page-ellipsis {
+  background: transparent;
+  color: var(--mute);
+}

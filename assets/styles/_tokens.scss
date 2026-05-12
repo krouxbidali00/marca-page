@@ -1,0 +1,48 @@
+// Design tokens — Bootstrap CSS-variable overrides + the Marca-Page palette.
+// Same technique as the mockups: we never touch Bootstrap's compiled CSS, we
+// just override its custom properties and add our own.
+
+:root {
+  // Brand / palette
+  --bs-primary: #E89BB8;
+  --bs-primary-rgb: 232, 155, 184;
+  --rose-soft: #F8C8DC;
+  --rose-powder: #FCE4EC;
+  --lavande: #E0D4F7;
+  --peche: #FFE5B4;
+  --sauge: #C8E6D0;
+  --ink: #3A2A33;
+  --mute: #8A7480;
+  --line: #F3E3EA;
+  --cream: #FFF9FB;
+
+  // Body
+  --bs-body-bg: #FFF9FB;
+  --bs-body-color: #3A2A33;
+  --bs-body-color-rgb: 58, 42, 51;
+  --bs-secondary-color: #8A7480;
+  --bs-border-color: #F3E3EA;
+  --bs-border-color-translucent: rgba(243, 227, 234, 0.7);
+
+  // Radii
+  --bs-border-radius: 1rem;
+  --bs-border-radius-sm: 0.625rem;
+  --bs-border-radius-lg: 1.5rem;
+  --bs-border-radius-xl: 2rem;
+  --bs-border-radius-pill: 999px;
+
+  // Links
+  --bs-link-color: #3A2A33;
+  --bs-link-color-rgb: 58, 42, 51;
+  --bs-link-hover-color: #E89BB8;
+  --bs-link-hover-color-rgb: 232, 155, 184;
+
+  // Focus ring
+  --bs-focus-ring-color: rgba(232, 155, 184, .35);
+  --bs-focus-ring-width: 4px;
+
+  // Shadows
+  --bs-box-shadow-sm: 0 1px 2px rgba(216, 140, 170, .06), 0 8px 22px -10px rgba(216, 140, 170, .20);
+  --bs-box-shadow: 0 2px 4px rgba(216, 140, 170, .08), 0 22px 44px -16px rgba(216, 140, 170, .28);
+  --bs-box-shadow-lg: 0 4px 6px rgba(216, 140, 170, .08), 0 36px 60px -20px rgba(216, 140, 170, .32);
+}

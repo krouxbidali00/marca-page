@@ -1,0 +1,55 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  font-size: .78rem;
+  font-weight: 500;
+  padding: .4rem .75rem;
+  border-radius: 999px;
+
+  &.pill--sm {
+    font-size: .7rem;
+    padding: .2rem .55rem;
+  }
+}
+
+.pill-lavande { background: #E0D4F7; color: #4A3C7A; }
+.pill-peche   { background: #FFE5B4; color: #7A5A2A; }
+.pill-sauge   { background: #C8E6D0; color: #2E5C3E; }
+.pill-rose    { background: #FCE4EC; color: #8A3A5C; }
+.pill-outline { background: #fff; color: #3A2A33; border: 1px solid var(--line); }
+
+// Status dot inside a pill (e.g. "En cours · page 142 / 186").
+.pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  background: currentColor;
+  opacity: .65;
+}
+
+// Filter / search chips.
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .4rem .85rem;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--line);
+  font-size: .85rem;
+  font-weight: 500;
+
+  &.chip-active {
+    background: #F8C8DC;
+    border-color: #F8C8DC;
+  }
+
+  .x {
+    color: var(--mute);
+    cursor: pointer;
+
+    &:hover { color: var(--ink); }
+  }
+}

@@ -1,0 +1,52 @@
+<footer class="site-footer border-top mt-4 mt-lg-5">
+    <div class="container py-5">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <a class="navbar-brand d-flex align-items-center gap-2 mb-3" href="{{ path('app_home') }}">
+                    <span class="brand-mark">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#3A2A33" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h12v17l-6-4-6 4v-17z"/></svg>
+                    </span>
+                    <span class="font-serif fs-4 fw-semibold">Marca-Page</span>
+                </a>
+                <p class="text-mute footer-blurb">La bibliothèque personnelle pensée pour les lecteurs. Pas de pub, pas d'algorithme, pas de bruit.</p>
+                <div class="d-flex gap-2 mt-3">
+                    <a href="#" class="btn btn-soft rounded-circle btn-circle" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="btn btn-soft rounded-circle btn-circle" aria-label="X"><i class="bi bi-twitter-x"></i></a>
+                    <a href="#" class="btn btn-soft rounded-circle btn-circle" aria-label="Flux RSS"><i class="bi bi-rss"></i></a>
+                </div>
+            </div>
+            <div class="col-6 col-lg-2">
+                <h6 class="font-serif fw-semibold mb-3">Produit</h6>
+                <ul class="list-unstyled d-flex flex-column gap-2 small">
+                    <li><a class="text-mute text-decoration-none" href="{{ path('app_library') }}">Bibliothèque</a></li>
+                    <li><a class="text-mute text-decoration-none" href="#">Étagères</a></li>
+                    <li><a class="text-mute text-decoration-none" href="#">Mobile</a></li>
+                    <li><a class="text-mute text-decoration-none" href="{{ path('app_home') }}#tarifs">Tarifs</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-lg-2">
+                <h6 class="font-serif fw-semibold mb-3">Outils</h6>
+                <ul class="list-unstyled d-flex flex-column gap-2 small">
+                    <li><a class="text-mute text-decoration-none" href="#">Import CSV</a></li>
+                    <li><a class="text-mute text-decoration-none" href="#">Export</a></li>
+                    <li><a class="text-mute text-decoration-none" href="#">Sauvegarde</a></li>
+                    <li><a class="text-mute text-decoration-none" href="#">Raccourcis</a></li>
+                </ul>
+            </div>
+            <div class="col-6 col-lg-2">
+                <h6 class="font-serif fw-semibold mb-3">Légal</h6>
+                <ul class="list-unstyled d-flex flex-column gap-2 small">
+                    <li><a class="text-mute text-decoration-none" href="#">Conditions</a></li>
+                    <li><a class="text-mute text-decoration-none" href="#">Confidentialité</a></li>
+                    <li><a class="text-mute text-decoration-none" href="#">Cookies</a></li>
+                    <li><a class="text-mute text-decoration-none" href="#">Mentions</a></li>
+                </ul>
+            </div>
+        </div>
+        <hr class="my-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <small class="text-mute">© {{ "now"|date("Y") }} Marca-Page · Fait avec soin.</small>
+            <small class="text-mute">Aucune donnée revendue. Promis.</small>
+        </div>
+    </div>
+</footer>

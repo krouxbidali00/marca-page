@@ -1,0 +1,31 @@
+.navbar-mr {
+  background: rgba(255, 249, 251, .85);
+  backdrop-filter: saturate(140%) blur(10px);
+  border-bottom: 1px solid var(--line);
+
+  .nav-link {
+    color: rgba(58, 42, 51, .78);
+    font-weight: 500;
+  }
+
+  .nav-link:hover,
+  .nav-link.active {
+    color: var(--ink);
+  }
+}
+
+.brand-mark {
+  width: 38px;
+  height: 38px;
+  border-radius: 14px;
+  background: var(--rose-soft);
+  display: grid;
+  place-items: center;
+  box-shadow: var(--bs-box-shadow-sm);
+
+  &.brand-mark--sm {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+  }
+}
