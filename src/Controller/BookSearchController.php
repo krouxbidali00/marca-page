@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Service\BookImporter;
-use App\Service\GoogleBooksClient;
+use App\Service\GoogleBooksClientInterface;
 use App\Service\GoogleBooksException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,7 +16,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class BookSearchController extends AbstractController
 {
     #[Route('/books/search', name: 'app_book_search', methods: ['GET'])]
-    public function search(Request $request, GoogleBooksClient $googleBooks): Response
+    public function search(Request $request, GoogleBooksClientInterface $googleBooks): Response
     {
         $query = trim((string) $request->query->get('q', ''));
         $results = [];

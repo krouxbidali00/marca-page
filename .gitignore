@@ -15,6 +15,11 @@
 /.phpunit.cache/
 ###< phpunit/phpunit ###
 
+###> squizlabs/php_codesniffer ###
+/.phpcs-cache
+/phpcs.xml
+###< squizlabs/php_codesniffer ###
+
 ###> symfony/asset-mapper ###
 /public/assets/
 /assets/vendor/

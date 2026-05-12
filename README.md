@@ -48,11 +48,24 @@ La base de test (`app_test`) doit exister et avoir le schema :
 ```bash
 docker compose exec php bin/console --env=test doctrine:database:create --if-not-exists
 docker compose exec php bin/console --env=test doctrine:migrations:migrate --no-interaction
+docker compose exec php bin/console sass:build   # genere var/sass/app.output.css, requis par les tests fonctionnels
 docker compose exec php bin/phpunit
 ```
 
 (Les tests fonctionnels utilisent `dama/doctrine-test-bundle` : chaque test s'execute
 dans une transaction annulee, donc la base de test n'est pas polluee.)
+
+## Lint
+
+Le code PHP suit PSR-12 (regles dans `phpcs.xml.dist`, applique a `src/` et `tests/`) :
+
+```bash
+docker compose exec php composer lint        # verifie
+docker compose exec php composer lint:fix    # corrige automatiquement (phpcbf)
+```
+
+Le workflow GitHub Actions (`.github/workflows/ci.yml`) execute le lint et les tests a
+chaque push sur `main` et sur les pull requests.
 
 ## Assets
 
