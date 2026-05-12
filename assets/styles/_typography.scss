@@ -32,6 +32,12 @@ body {
   font-weight: 600;
 }
 
+.ls-tight { letter-spacing: -.02em; }
+
+.measure-sm { max-width: 440px; }
+.measure-md { max-width: 540px; }
+.measure-lg { max-width: 640px; }
+
 // Soft-rose underline used on inline emphasis links.
 .underline-rose {
   border-bottom: 2px solid var(--rose-soft) !important;

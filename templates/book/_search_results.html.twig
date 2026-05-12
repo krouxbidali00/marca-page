@@ -1,0 +1,37 @@
+{# Params: query (string), results (GoogleBookResult[]), error (?string) #}
+{% if error %}
+    <div class="alert alert-danger rounded-4 border-0">{{ error }}</div>
+{% endif %}
+
+{% if query == '' %}
+    <p class="text-mute text-center py-5">Tapez quelque chose ci-dessus pour rechercher dans le catalogue Google Books.</p>
+{% elseif results|length == 0 and not error %}
+    <p class="text-mute text-center py-5">Aucun résultat pour « {{ query }} ».</p>
+{% else %}
+    <div class="d-flex flex-column gap-3">
+        {% for result in results %}
+            {% set theme = result.title|length % 12 %}
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <div class="d-flex gap-3 align-items-center flex-wrap flex-md-nowrap">
+                    {% if result.thumbnailUrl %}
+                        <div class="cover cover--xs"><span class="spine"></span><img class="cover-img" src="{{ result.thumbnailUrl }}" alt="Couverture de {{ result.title }}" loading="lazy"></div>
+                    {% else %}
+                        <div class="cover cover--xs cover--theme-{{ theme }}"><span class="spine"></span><div class="deco"></div><div class="body"><div class="author-c">{{ result.authors|first|default('') }}</div><div class="title-c">{{ result.title }}</div></div></div>
+                    {% endif %}
+                    <div class="flex-grow-1">
+                        <div class="font-serif fs-5 fw-semibold lh-sm">{{ result.title }}</div>
+                        {% if result.subtitle %}<div class="text-mute small fst-italic">{{ result.subtitle }}</div>{% endif %}
+                        <div class="text-mute small mb-1">{{ result.authorsLine }}{% if result.publisher %} · {{ result.publisher }}{% endif %}{% if result.publishedYear %} · {{ result.publishedYear }}{% endif %}{% if result.pageCount %} · {{ result.pageCount }} p.{% endif %}</div>
+                        {% if result.description %}<p class="text-mute small mb-0">{{ result.description|length > 180 ? result.description|slice(0, 180) ~ '…' : result.description }}</p>{% endif %}
+                    </div>
+                    <form method="post" action="{{ path('app_book_import') }}" class="flex-shrink-0">
+                        <input type="hidden" name="_token" value="{{ csrf_token('import_book') }}">
+                        <input type="hidden" name="volumeId" value="{{ result.volumeId }}">
+                        <input type="hidden" name="q" value="{{ query }}">
+                        <button type="submit" class="btn btn-primary rounded-pill px-3 text-nowrap"><i class="bi bi-plus-lg me-1"></i> Ajouter</button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}

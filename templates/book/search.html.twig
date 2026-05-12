@@ -5,8 +5,28 @@
 {% block footer %}{% include '_partials/footer_compact.html.twig' %}{% endblock %}
 
 {% block body %}
-    <div class="container py-5">
-        <h1 class="font-serif display-5 fw-semibold">Ajouter un livre</h1>
-        <p class="text-mute">Recherche Google Books — à finaliser.</p>
+<header class="position-relative overflow-hidden">
+    <div class="blob page-blob--1"></div>
+    <div class="blob page-blob--2"></div>
+    <div class="container py-5 position-relative">
+        <div class="text-center mb-4">
+            <small class="eyebrow">Catalogue Google Books</small>
+            <h1 class="font-serif display-5 fw-semibold mt-2 mb-3">Ajouter un livre à <em class="fst-italic text-primary">votre rayon</em>.</h1>
+            <p class="text-mute fs-5 mb-4">Cherchez par titre, auteur ou ISBN — les métadonnées sont récupérées automatiquement.</p>
+        </div>
+        <form method="get" action="{{ path('app_book_search') }}" class="search-wrap"
+              data-controller="book-search" data-book-search-url-value="{{ path('app_book_search') }}"
+              data-action="submit->book-search#run">
+            <i class="bi bi-search"></i>
+            <input type="search" name="q" class="search-input" placeholder="L'Étranger, Camus, 9782070360024…" value="{{ query }}" autofocus
+                   data-book-search-target="input" data-action="input->book-search#schedule">
+        </form>
     </div>
+</header>
+
+<main class="container pb-5">
+    <div data-book-search-target="results">
+        {{ include('book/_search_results.html.twig') }}
+    </div>
+</main>
 {% endblock %}

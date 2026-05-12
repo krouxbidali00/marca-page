@@ -110,6 +110,13 @@
   .title-c { font-size: 1.75rem; }
 }
 
+// Fixed-height cover for the home-page carousel.
+.cover--carousel {
+  height: 320px;
+
+  .title-c { font-size: 1.75rem; }
+}
+
 .cover--sm {
   width: 120px;
   height: 170px;

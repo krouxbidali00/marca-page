@@ -12,6 +12,9 @@
   }
 }
 
+// Fixed-width card in the home-page horizontal carousel.
+.carousel-card { flex: 0 0 220px; }
+
 // Horizontal "similar book" card on the detail page.
 .sim-card {
   transition: transform .2s ease;

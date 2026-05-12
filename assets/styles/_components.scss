@@ -66,6 +66,8 @@
 
   &::-webkit-scrollbar { height: 6px; }
   &::-webkit-scrollbar-thumb { background: var(--rose-powder); border-radius: 999px; }
+
+  &.scroll-row--bleed { margin-inline: -.5rem; padding-inline: .5rem; }
 }
 
 // Brand-coloured checkboxes / radios everywhere
