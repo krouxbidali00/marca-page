@@ -66,6 +66,9 @@ jobs:
       - name: Install dependencies
         uses: ramsey/composer-install@v3
 
+      - name: Compile Sass
+        run: php bin/console sass:build
+
       - name: Create test database
         run: php bin/console doctrine:database:create --if-not-exists --no-interaction
 

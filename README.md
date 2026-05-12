@@ -48,6 +48,7 @@ La base de test (`app_test`) doit exister et avoir le schema :
 ```bash
 docker compose exec php bin/console --env=test doctrine:database:create --if-not-exists
 docker compose exec php bin/console --env=test doctrine:migrations:migrate --no-interaction
+docker compose exec php bin/console sass:build   # genere var/sass/app.output.css, requis par les tests fonctionnels
 docker compose exec php bin/phpunit
 ```
 
