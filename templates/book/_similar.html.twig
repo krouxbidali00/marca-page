@@ -1,0 +1,22 @@
+{# Params: similar (Book[]) #}
+<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+    {% for book in similar %}
+        <div class="col">
+            <a href="{{ path('app_book_show', {id: book.id}) }}" class="text-decoration-none text-ink">
+                <div class="card sim-card border-0 shadow-sm rounded-4 p-4 h-100">
+                    <div class="d-flex gap-3">
+                        {{ include('_partials/book_cover.html.twig', {book: book, size: 'xs'}) }}
+                        <div class="d-flex flex-column justify-content-between">
+                            <div>
+                                <div class="font-serif fs-5 fw-semibold lh-sm mb-1">{{ book.title }}</div>
+                                <small class="text-mute d-block mb-2">{{ book.authorsLine }}{% if book.publishedYear %} · {{ book.publishedYear }}{% endif %}</small>
+                                {% if book.primaryCategory %}<span class="pill pill-rose pill--sm">{{ book.primaryCategory }}</span>{% endif %}
+                            </div>
+                            <div class="text-mute small mt-2">{{ include('_partials/reading_status_badge.html.twig', {status: book.readingStatus}) }}</div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    {% endfor %}
+</div>

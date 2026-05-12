@@ -1,0 +1,30 @@
+{# Params: book #}
+<div class="d-flex flex-column gap-3">
+    {% for quote in book.quotes %}
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+            <div class="d-flex justify-content-between align-items-start gap-3">
+                <div>
+                    <p class="font-serif fs-5 mb-2">« {{ quote.text }} »</p>
+                    <small class="text-mute">{% if quote.page %}page {{ quote.page }} · {% endif %}ajoutée le {{ quote.createdAt|date('d/m/Y') }}</small>
+                </div>
+                <form method="post" action="{{ path('app_quote_delete', {id: book.id, quote: quote.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('book_action_' ~ book.id) }}">
+                    <button type="submit" class="btn btn-link text-mute p-1" aria-label="Supprimer la citation"><i class="bi bi-trash"></i></button>
+                </form>
+            </div>
+        </div>
+    {% else %}
+        <p class="text-mute fst-italic">Aucune citation enregistrée pour ce livre.</p>
+    {% endfor %}
+
+    <form method="post" action="{{ path('app_quote_add', {id: book.id}) }}" class="card border-0 shadow-sm rounded-4 p-4">
+        <input type="hidden" name="_token" value="{{ csrf_token('book_action_' ~ book.id) }}">
+        <label class="filter-label mb-2 d-block" for="quoteText">Ajouter une citation</label>
+        <textarea class="form-control mb-2" id="quoteText" name="text" rows="2" placeholder="Le passage qui vous a marqué…" required></textarea>
+        <div class="d-flex gap-2 align-items-center">
+            <input type="number" min="1" name="page" class="form-control w-auto" placeholder="Page (optionnel)">
+
+            <button type="submit" class="btn btn-soft rounded-pill px-3 text-nowrap"><i class="bi bi-plus-lg me-1"></i> Ajouter</button>
+        </div>
+    </form>
+</div>

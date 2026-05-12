@@ -34,9 +34,23 @@
     background: transparent;
     padding: 0;
     resize: none;
+    line-height: 1.6;
 
     &:focus { box-shadow: none; }
   }
+}
+
+// Left column blocks under the big cover share its width.
+.detail-aside-block {
+  max-width: 340px;
+  margin-inline: auto;
+}
+
+// Big book title on the detail page.
+.book-title {
+  font-size: clamp(2.5rem, 5vw, 3.75rem);
+  letter-spacing: -.02em;
+  line-height: 1.05;
 }
 
 // Quote callout

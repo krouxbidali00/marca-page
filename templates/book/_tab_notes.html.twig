@@ -1,0 +1,18 @@
+{# Params: book #}
+<p class="text-mute mb-3">Vos pensées, vos passages préférés, vos rappels — privés, jamais partagés.</p>
+<form method="post" action="{{ path('app_book_notes', {id: book.id}) }}"
+      data-controller="notes-autosave"
+      data-notes-autosave-url-value="{{ path('app_book_notes', {id: book.id}) }}"
+      data-notes-autosave-token-value="{{ csrf_token('book_action_' ~ book.id) }}">
+    <input type="hidden" name="_token" value="{{ csrf_token('book_action_' ~ book.id) }}">
+    <div class="note-area">
+        <label class="filter-label mb-2 d-block" for="personalNotes"><i class="bi bi-pencil"></i> Mes notes personnelles</label>
+        <textarea class="form-control fs-5 font-serif" id="personalNotes" name="personalNotes" rows="6"
+                  placeholder="Commencez à écrire ce que ce livre vous a inspiré…"
+                  data-notes-autosave-target="field" data-action="input->notes-autosave#schedule">{{ book.personalNotes }}</textarea>
+        <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+            <small class="text-mute" data-notes-autosave-target="status">{% if book.personalNotes %}<i class="bi bi-clock-history"></i> Enregistré{% endif %}</small>
+            <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3">Enregistrer</button>
+        </div>
+    </div>
+</form>

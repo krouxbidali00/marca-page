@@ -1,13 +1,151 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ book.title }} · Marca-Page{% endblock %}
+{% block title %}{{ book.title }} — {{ book.authorsLine }} · Marca-Page{% endblock %}
 {% block navbar %}{% include '_partials/navbar_app.html.twig' %}{% endblock %}
 {% block footer %}{% include '_partials/footer_compact.html.twig' %}{% endblock %}
 
+{% set action_token = csrf_token('book_action_' ~ book.id) %}
+
 {% block body %}
-    <div class="container py-5">
-        <h1 class="font-serif display-5 fw-semibold">{{ book.title }}</h1>
-        <p class="text-mute">{{ book.authorsLine }}</p>
-        <p class="text-mute">Détail du livre — à finaliser.</p>
+<div class="container pt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb small mb-0">
+            <li class="breadcrumb-item"><a href="{{ path('app_home') }}" class="text-mute text-decoration-none">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="{{ path('app_library') }}" class="text-mute text-decoration-none">Bibliothèque</a></li>
+            <li class="breadcrumb-item active text-ink" aria-current="page">{{ book.title }}</li>
+        </ol>
+    </nav>
+</div>
+
+<section class="container py-4 py-lg-5 position-relative">
+    <div class="row g-5">
+
+        <aside class="col-lg-5 col-xl-4">
+            <div class="sticky-cover">
+                <div class="cover-stage mx-auto mb-4">
+                    {{ include('_partials/book_cover.html.twig', {book: book, size: 'hero'}) }}
+                </div>
+
+                <div class="action-row d-grid gap-2 mb-3 detail-aside-block">
+                    <form method="post" action="{{ path('app_book_reading_progress', {id: book.id}) }}">
+                        <input type="hidden" name="_token" value="{{ action_token }}">
+                        <input type="hidden" name="readingStatus" value="{{ book.readingStatus.value == 'finished' ? 'reading' : 'finished' }}">
+                        <button type="submit" class="btn {{ book.readingStatus.value == 'finished' ? 'is-active' : 'btn-primary' }} rounded-pill fw-medium w-100 d-flex align-items-center justify-content-center gap-2">
+                            {% if book.readingStatus.value == 'finished' %}<i class="bi bi-check-circle-fill fs-5"></i> Terminé{% else %}<i class="bi bi-check2-circle fs-5"></i> Marquer comme lu{% endif %}
+                        </button>
+                    </form>
+                    <form method="post" action="{{ path('app_book_purchase', {id: book.id}) }}">
+                        <input type="hidden" name="_token" value="{{ action_token }}">
+                        <input type="hidden" name="purchaseStatus" value="{{ book.purchaseStatus.value == 'bought' ? 'to_buy' : 'bought' }}">
+                        <button type="submit" class="btn {{ book.purchaseStatus.value == 'bought' ? 'is-active' : 'btn-outline-primary' }} rounded-pill fw-medium w-100 d-flex align-items-center justify-content-center gap-2">
+                            {% if book.purchaseStatus.value == 'bought' %}<i class="bi bi-bag-check-fill fs-5"></i> Acheté{% else %}<i class="bi bi-bag-heart fs-5"></i> J'ai acheté ce livre{% endif %}
+                        </button>
+                    </form>
+                </div>
+
+                <div class="row g-2 detail-aside-block">
+                    <div class="col-4">
+                        <div class="card border-0 shadow-sm rounded-4 text-center py-3">
+                            <div class="text-mute small mb-1">Pages</div>
+                            <div class="font-serif fs-4 fw-semibold">{{ book.pageCount ?? '—' }}</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card border-0 shadow-sm rounded-4 text-center py-3">
+                            <div class="text-mute small mb-1">Durée</div>
+                            <div class="font-serif fs-4 fw-semibold">{{ book.pageCount ? '~' ~ (book.pageCount / 55)|round ~ ' h' : '—' }}</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card border-0 shadow-sm rounded-4 text-center py-3">
+                            <div class="text-mute small mb-1">Langue</div>
+                            <div class="font-serif fs-4 fw-semibold">{{ book.language ? book.language|upper : '—' }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-center gap-2 mt-4">
+                    <button type="button" class="btn btn-soft rounded-circle btn-circle btn-circle--md" aria-label="Aimer"><i class="bi bi-heart"></i></button>
+                    <button type="button" class="btn btn-soft rounded-circle btn-circle btn-circle--md" aria-label="Ajouter à une étagère"><i class="bi bi-bookmark-plus"></i></button>
+                    <button type="button" class="btn btn-soft rounded-circle btn-circle btn-circle--md" aria-label="Prêter"><i class="bi bi-arrow-left-right"></i></button>
+                    <button type="button" class="btn btn-soft rounded-circle btn-circle btn-circle--md" aria-label="Partager"><i class="bi bi-share"></i></button>
+                </div>
+            </div>
+        </aside>
+
+        <div class="col-lg-7 col-xl-8">
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                {% if book.primaryCategory %}<span class="pill pill-rose"><i class="bi bi-bookmark-fill"></i> {{ book.primaryCategory }}</span>{% endif %}
+                {% if book.publishedYear %}<span class="pill pill-outline"><i class="bi bi-calendar3"></i> {{ book.publishedYear }}</span>{% endif %}
+                {% if book.language %}<span class="pill pill-outline"><i class="bi bi-translate"></i> {{ book.language|upper }}</span>{% endif %}
+            </div>
+
+            <h1 class="font-serif fw-semibold mb-2 book-title">{{ book.title }}</h1>
+            {% if book.subtitle %}<p class="fs-4 text-mute font-serif fst-italic mb-2">{{ book.subtitle }}</p>{% endif %}
+            <p class="fs-5 text-mute mb-4">
+                par <a href="{{ path('app_library', {q: book.authors|first}) }}" class="text-ink fw-medium text-decoration-none underline-rose">{{ book.authorsLine }}</a>
+                {% if book.publisher %}<span class="mx-2">·</span>{{ book.publisher }}{% endif %}
+            </p>
+
+            <div class="d-flex flex-wrap align-items-center gap-3 mb-4"
+                 data-controller="rating"
+                 data-rating-url-value="{{ path('app_book_rating', {id: book.id}) }}"
+                 data-rating-token-value="{{ action_token }}"
+                 data-rating-current-value="{{ book.rating ?? 0 }}">
+                <small class="filter-label">Votre note</small>
+                <div class="d-flex align-items-center gap-1">
+                    {% for i in 1..5 %}
+                        <button type="button" class="btn btn-link p-1 stars" aria-label="{{ i }} étoile{{ i > 1 ? 's' }}" data-rating-target="star" data-rating-value-param="{{ i }}" data-action="mouseenter->rating#hover mouseleave->rating#reset click->rating#pick"><i class="bi {{ i <= (book.rating ?? 0) ? 'bi-star-fill' : 'bi-star' }} fs-4"></i></button>
+                    {% endfor %}
+                </div>
+                <span class="font-serif fs-4 fw-semibold" data-rating-target="output">{{ book.rating ?? 0 }}</span><span class="text-mute">/ 5</span>
+                <noscript>
+                    <form method="post" action="{{ path('app_book_rating', {id: book.id}) }}" class="d-flex gap-2">
+                        <input type="hidden" name="_token" value="{{ action_token }}">
+                        <select name="rating" class="form-select form-select-sm rounded-pill">
+                            <option value="">—</option>
+                            {% for i in 1..5 %}<option value="{{ i }}" {{ book.rating == i ? 'selected' }}>{{ i }}</option>{% endfor %}
+                        </select>
+                        <button class="btn btn-soft btn-sm rounded-pill">Noter</button>
+                    </form>
+                </noscript>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mb-5">
+                {{ include('_partials/reading_status_badge.html.twig', {status: book.readingStatus, book: book}) }}
+                {{ include('_partials/purchase_status_badge.html.twig', {status: book.purchaseStatus, book: book}) }}
+                {% if book.shelf %}<span class="pill pill-lavande"><i class="bi bi-collection"></i> Étagère : {{ book.shelf.name }}</span>{% endif %}
+            </div>
+
+            <ul class="nav nav-pills gap-2 mb-4" role="tablist">
+                <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-resume" type="button">Résumé</button></li>
+                <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-notes" type="button">Mes notes</button></li>
+                <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-citations" type="button">Citations</button></li>
+                <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-details" type="button">Détails</button></li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="tab-resume">{{ include('book/_tab_summary.html.twig') }}</div>
+                <div class="tab-pane fade" id="tab-notes">{{ include('book/_tab_notes.html.twig') }}</div>
+                <div class="tab-pane fade" id="tab-citations">{{ include('book/_tab_quotes.html.twig') }}</div>
+                <div class="tab-pane fade" id="tab-details">{{ include('book/_tab_details.html.twig') }}</div>
+            </div>
+        </div>
     </div>
+</section>
+
+{% if similar|length %}
+    <section class="border-top mt-5 bg-white">
+        <div class="container py-5">
+            <div class="d-flex justify-content-between align-items-end mb-4 flex-wrap gap-2">
+                <div>
+                    <small class="eyebrow">Pour aller plus loin</small>
+                    <h2 class="font-serif fs-2 fw-semibold mb-0 mt-2">Livres similaires</h2>
+                </div>
+                <a href="{{ path('app_library') }}" class="btn btn-link fw-medium">Voir tout <i class="bi bi-arrow-right ms-1"></i></a>
+            </div>
+            {{ include('book/_similar.html.twig', {similar: similar}) }}
+        </div>
+    </section>
+{% endif %}
 {% endblock %}

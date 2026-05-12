@@ -1,0 +1,27 @@
+{# Params (from context): book, similar #}
+{% if book.description %}
+    <p class="fs-5 lh-lg mb-3">{{ book.description|nl2br }}</p>
+{% else %}
+    <p class="text-mute fst-italic mb-3">Aucun résumé fourni par Google Books pour ce livre.</p>
+{% endif %}
+
+{% set lastQuote = book.quotes|first %}
+{% if lastQuote %}
+    <figure class="quote-callout my-4">
+        <span class="quote-mark">“</span>
+        <blockquote class="font-serif fs-4 fw-medium mb-3 mt-2">{{ lastQuote.text }}</blockquote>
+        <figcaption class="small text-mute">{% if lastQuote.page %}page {{ lastQuote.page }} · {% endif %}ajoutée le {{ lastQuote.createdAt|date('d/m/Y') }}</figcaption>
+    </figure>
+{% endif %}
+
+<div class="card border-0 shadow-sm rounded-4 p-4 mt-4">
+    <div class="d-flex align-items-start gap-3">
+        <span class="avatar avatar--lg avatar--rose flex-shrink-0">{{ book.authors|first|default('?')|slice(0, 1)|upper }}</span>
+        <div>
+            <div class="text-mute small mb-1">À propos de l'auteur</div>
+            <h6 class="font-serif fs-5 fw-semibold mb-1">{{ book.authorsLine }}</h6>
+            <p class="text-mute mb-2">Aucune biographie disponible pour le moment.</p>
+            <a href="{{ path('app_library', {q: book.authors|first}) }}" class="btn btn-link p-0 small fw-medium">Voir d'autres livres de cet auteur <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+</div>

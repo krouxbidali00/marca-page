@@ -1,0 +1,71 @@
+{# Params: book, shelves #}
+{% set action_token = csrf_token('book_action_' ~ book.id) %}
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6"><div class="text-mute small">ISBN</div><div class="fw-medium">{{ book.isbn ?? '—' }}</div></div>
+    <div class="col-sm-6"><div class="text-mute small">Éditeur</div><div class="fw-medium">{{ book.publisher ?? '—' }}</div></div>
+    <div class="col-sm-6"><div class="text-mute small">Format</div><div class="fw-medium">{{ book.purchaseFormat ?? '—' }}</div></div>
+    <div class="col-sm-6"><div class="text-mute small">Pages</div><div class="fw-medium">{{ book.pageCount ? book.pageCount ~ ' pages' : '—' }}</div></div>
+    <div class="col-sm-6"><div class="text-mute small">Première parution</div><div class="fw-medium">{{ book.publishedYear ?? '—' }}</div></div>
+    <div class="col-sm-6"><div class="text-mute small">Ajouté à votre bibliothèque</div><div class="fw-medium">{{ book.addedAt|date('d/m/Y') }}</div></div>
+    <div class="col-sm-6"><div class="text-mute small">Langue</div><div class="fw-medium">{{ book.language ? book.language|upper : '—' }}</div></div>
+    <div class="col-sm-6"><div class="text-mute small">Catégories</div><div class="fw-medium">{{ book.categories|length ? book.categories|join(', ') : '—' }}</div></div>
+</div>
+
+<hr class="my-4">
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <h6 class="font-serif fw-semibold mb-3">Progression de lecture</h6>
+        <form method="post" action="{{ path('app_book_reading_progress', {id: book.id}) }}" class="d-flex flex-column gap-2">
+            <input type="hidden" name="_token" value="{{ action_token }}">
+            <select name="readingStatus" class="form-select rounded-pill">
+                {% for status in readingStatuses %}
+                    <option value="{{ status.value }}" {{ book.readingStatus == status ? 'selected' }}>{{ status.label }}</option>
+                {% endfor %}
+            </select>
+            <input type="number" min="0" max="{{ book.pageCount ?? 99999 }}" name="currentPage" class="form-control" placeholder="Page actuelle" value="{{ book.currentPage }}">
+            <button type="submit" class="btn btn-soft rounded-pill align-self-start px-3">Mettre à jour</button>
+        </form>
+    </div>
+
+    <div class="col-md-6">
+        <h6 class="font-serif fw-semibold mb-3">Achat</h6>
+        <form method="post" action="{{ path('app_book_purchase', {id: book.id}) }}" class="d-flex flex-column gap-2">
+            <input type="hidden" name="_token" value="{{ action_token }}">
+            <select name="purchaseStatus" class="form-select rounded-pill">
+                {% for status in purchaseStatuses %}
+                    <option value="{{ status.value }}" {{ book.purchaseStatus == status ? 'selected' }}>{{ status.label }}</option>
+                {% endfor %}
+            </select>
+            <input type="text" name="purchaseFormat" class="form-control" placeholder="Format (poche, broché…)" value="{{ book.purchaseFormat }}">
+            <input type="date" name="purchasedAt" class="form-control" value="{{ book.purchasedAt ? book.purchasedAt|date('Y-m-d') }}">
+            <button type="submit" class="btn btn-soft rounded-pill align-self-start px-3">Mettre à jour</button>
+        </form>
+    </div>
+
+    <div class="col-md-6">
+        <h6 class="font-serif fw-semibold mb-3">Étagère</h6>
+        <form method="post" action="{{ path('app_book_shelf', {id: book.id}) }}" class="d-flex gap-2 mb-2">
+            <input type="hidden" name="_token" value="{{ action_token }}">
+            <select name="shelfId" class="form-select rounded-pill">
+                <option value="">Aucune étagère</option>
+                {% for shelf in shelves %}<option value="{{ shelf.id }}" {{ book.shelf and book.shelf.id == shelf.id ? 'selected' }}>{{ shelf.name }}</option>{% endfor %}
+            </select>
+            <button type="submit" class="btn btn-soft rounded-pill px-3 text-nowrap">Ranger</button>
+        </form>
+        <form method="post" action="{{ path('app_shelf_create') }}" class="d-flex gap-2">
+            <input type="hidden" name="_token" value="{{ csrf_token('create_shelf') }}">
+            <input type="hidden" name="_back" value="{{ path('app_book_show', {id: book.id}) }}">
+            <input type="text" name="name" class="form-control" placeholder="Nouvelle étagère…" maxlength="80">
+            <button type="submit" class="btn btn-link text-nowrap p-0"><i class="bi bi-plus-lg"></i> Créer</button>
+        </form>
+    </div>
+
+    <div class="col-md-6 d-flex align-items-end">
+        <form method="post" action="{{ path('app_book_delete', {id: book.id}) }}" onsubmit="return confirm('Retirer définitivement ce livre de votre bibliothèque ?');">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete_book_' ~ book.id) }}">
+            <button type="submit" class="btn btn-link text-danger p-0"><i class="bi bi-trash me-1"></i> Retirer ce livre de ma bibliothèque</button>
+        </form>
+    </div>
+</div>
