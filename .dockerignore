@@ -1,0 +1,13 @@
+.git/
+.github/
+.idea/
+docs/
+node_modules/
+var/
+vendor/
+.dockerignore
+.editorconfig
+.env.local
+.env.*.local
+compose*.yaml
+Dockerfile

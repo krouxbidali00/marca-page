@@ -1,0 +1,30 @@
+{
+	{$CADDY_GLOBAL_OPTIONS}
+	frankenphp {
+		{$FRANKENPHP_CONFIG}
+	}
+}
+
+{$CADDY_EXTRA_CONFIG}
+
+{$SERVER_NAME:localhost} {
+	log {
+		{$CADDY_SERVER_LOG_OPTIONS}
+		output stderr
+		format filter {
+			wrap console
+			fields {
+				uri query {
+					replace authorization REDACTED
+				}
+			}
+		}
+	}
+
+	root /app/public
+	encode zstd br gzip
+
+	php_server {
+		try_files {path} index.php
+	}
+}
