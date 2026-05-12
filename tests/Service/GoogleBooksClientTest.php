@@ -63,10 +63,39 @@ class GoogleBooksClientTest extends TestCase
 
     public function testSearchThrowsOnHttpError(): void
     {
-        $client = new GoogleBooksClient(new MockHttpClient(new MockResponse('boom', ['http_code' => 503])), '');
+        $client = new GoogleBooksClient(new MockHttpClient(new MockResponse('boom', ['http_code' => 400])), '');
 
         $this->expectException(GoogleBooksException::class);
         $client->search('camus');
+    }
+
+    public function testSearchFallsBackToTitleQueryOnTemporaryHttpError(): void
+    {
+        $json = json_encode(['items' => [[
+            'id' => 'franz-1',
+            'volumeInfo' => [
+                'title' => 'Le Procès',
+                'authors' => ['Franz Kafka'],
+            ],
+        ]]], JSON_THROW_ON_ERROR);
+        $queries = [];
+        $httpClient = new MockHttpClient(function (string $method, string $url, array $options) use (&$queries, $json): MockResponse {
+            $queries[] = $options['query']['q'] ?? null;
+
+            if (\count($queries) === 1) {
+                return new MockResponse(json_encode(['error' => ['code' => 503]], JSON_THROW_ON_ERROR), ['http_code' => 503]);
+            }
+
+            return new MockResponse($json);
+        });
+
+        $client = new GoogleBooksClient($httpClient, '');
+
+        $results = $client->search('Franz');
+
+        self::assertSame(['Franz', 'intitle:Franz'], $queries);
+        self::assertCount(1, $results);
+        self::assertSame('Le Procès', $results[0]->title);
     }
 
     public function testGetVolumeMapsVolume(): void

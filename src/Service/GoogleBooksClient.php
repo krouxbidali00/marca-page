@@ -25,12 +25,23 @@ class GoogleBooksClient implements GoogleBooksClientInterface
             return [];
         }
 
-        $data = $this->request(self::BASE, [
+        $params = [
             'q' => $query,
             'maxResults' => max(1, min(40, $maxResults)),
             'printType' => 'books',
             'orderBy' => 'relevance',
-        ]);
+        ];
+
+        try {
+            $data = $this->request(self::BASE, $params);
+        } catch (GoogleBooksException $e) {
+            if (!$this->isTemporaryFailure($e)) {
+                throw $e;
+            }
+
+            // Google Books can return backendFailed for broad terms while title-qualified searches work.
+            $data = $this->request(self::BASE, array_replace($params, ['q' => 'intitle:' . $query]));
+        }
 
         $items = \is_array($data['items'] ?? null) ? $data['items'] : [];
 
@@ -66,7 +77,7 @@ class GoogleBooksClient implements GoogleBooksClientInterface
             $response = $this->httpClient->request('GET', $url, ['query' => $params, 'timeout' => 8]);
             $status = $response->getStatusCode();
             if ($status >= 400) {
-                throw new GoogleBooksException(\sprintf('Google Books API returned HTTP %d.', $status));
+                throw new GoogleBooksException(\sprintf('Google Books API returned HTTP %d.', $status), $status);
             }
 
             return $response->toArray();
@@ -75,6 +86,13 @@ class GoogleBooksClient implements GoogleBooksClientInterface
         } catch (HttpExceptionInterface|\JsonException $e) {
             throw new GoogleBooksException('Could not reach the Google Books API.', 0, $e);
         }
+    }
+
+    private function isTemporaryFailure(GoogleBooksException $exception): bool
+    {
+        $code = $exception->getCode();
+
+        return $code >= 500;
     }
 
     /**
