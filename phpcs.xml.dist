@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<ruleset name="marca-page">
+    <description>PSR-12 coding standard for the Marca-Page application code.</description>
+
+    <file>src</file>
+    <file>tests</file>
+
+    <arg name="colors"/>
+    <arg value="sp"/><!-- s: show sniff codes, p: progress -->
+
+    <rule ref="PSR12"/>
+
+    <!-- Allow longer lines than PSR-12's 120-char soft limit (route attributes, French label arrays). -->
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="160"/>
+            <property name="absoluteLineLimit" value="0"/>
+        </properties>
+    </rule>
+</ruleset>

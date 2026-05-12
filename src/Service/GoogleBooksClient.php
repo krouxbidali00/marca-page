@@ -83,7 +83,7 @@ class GoogleBooksClient implements GoogleBooksClientInterface
             return $response->toArray();
         } catch (GoogleBooksException $e) {
             throw $e;
-        } catch (HttpExceptionInterface|\JsonException $e) {
+        } catch (HttpExceptionInterface | \JsonException $e) {
             throw new GoogleBooksException('Could not reach the Google Books API.', 0, $e);
         }
     }
