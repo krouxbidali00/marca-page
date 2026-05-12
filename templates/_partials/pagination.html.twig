@@ -1,0 +1,26 @@
+{# Params: page (App\Pagination\Page), route (route name), params (base query params, without "page") #}
+{% if page.pageCount > 1 %}
+    <nav class="d-flex justify-content-center mt-5" aria-label="Pagination">
+        <ul class="pagination gap-1 mb-0">
+            <li class="page-item {{ not page.hasPrevious ? 'disabled' }}">
+                <a class="page-link" href="{{ page.hasPrevious ? path(route, params|merge({page: page.page - 1})) : '#' }}" aria-label="Page précédente"><i class="bi bi-chevron-left"></i></a>
+            </li>
+            {% if 1 not in page.pageRange %}
+                <li class="page-item"><a class="page-link" href="{{ path(route, params|merge({page: 1})) }}">1</a></li>
+                <li class="page-item"><span class="page-link page-ellipsis">…</span></li>
+            {% endif %}
+            {% for n in page.pageRange %}
+                <li class="page-item {{ n == page.page ? 'active' }}">
+                    <a class="page-link" href="{{ path(route, params|merge({page: n})) }}">{{ n }}</a>
+                </li>
+            {% endfor %}
+            {% if page.pageCount not in page.pageRange %}
+                <li class="page-item"><span class="page-link page-ellipsis">…</span></li>
+                <li class="page-item"><a class="page-link" href="{{ path(route, params|merge({page: page.pageCount})) }}">{{ page.pageCount }}</a></li>
+            {% endif %}
+            <li class="page-item {{ not page.hasNext ? 'disabled' }}">
+                <a class="page-link" href="{{ page.hasNext ? path(route, params|merge({page: page.page + 1})) : '#' }}" aria-label="Page suivante"><i class="bi bi-chevron-right"></i></a>
+            </li>
+        </ul>
+    </nav>
+{% endif %}

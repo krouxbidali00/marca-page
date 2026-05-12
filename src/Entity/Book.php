@@ -36,6 +36,10 @@ class Book
     #[ORM\Column]
     private array $authors = [];
 
+    /** Lowercased, space-joined authors — kept in sync for searching/sorting. */
+    #[ORM\Column(length: 600)]
+    private string $authorsText = '';
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $publisher = null;
 
@@ -54,6 +58,10 @@ class Book
     /** @var string[] */
     #[ORM\Column]
     private array $categories = [];
+
+    /** Lowercased, space-joined categories — kept in sync for filtering. */
+    #[ORM\Column(length: 600)]
+    private string $categoriesText = '';
 
     #[ORM\Column(length: 13, nullable: true)]
     private ?string $isbn10 = null;
@@ -179,8 +187,14 @@ class Book
     public function setAuthors(array $authors): static
     {
         $this->authors = array_values($authors);
+        $this->authorsText = mb_strtolower(implode(' ', $this->authors));
 
         return $this;
+    }
+
+    public function getAuthorsText(): string
+    {
+        return $this->authorsText;
     }
 
     public function getAuthorsLine(): string
@@ -263,8 +277,14 @@ class Book
     public function setCategories(array $categories): static
     {
         $this->categories = array_values($categories);
+        $this->categoriesText = mb_strtolower(implode(' ', $this->categories));
 
         return $this;
+    }
+
+    public function getCategoriesText(): string
+    {
+        return $this->categoriesText;
     }
 
     public function getPrimaryCategory(): ?string

@@ -4,9 +4,76 @@
 {% block navbar %}{% include '_partials/navbar_app.html.twig' %}{% endblock %}
 {% block footer %}{% include '_partials/footer_compact.html.twig' %}{% endblock %}
 
+{% set sort_labels = {recent: 'Récemment ajoutés', title_asc: 'Alphabétique (A → Z)', author: 'Par auteur', rating: 'Ma note', published: 'Date de parution'} %}
+
 {% block body %}
-    <div class="container py-5">
-        <h1 class="font-serif display-5 fw-semibold">Ma bibliothèque</h1>
-        <p class="text-mute">Liste des livres — à finaliser.</p>
+<header class="position-relative overflow-hidden">
+    <div class="blob page-blob--1"></div>
+    <div class="blob page-blob--2"></div>
+    <div class="container py-5 position-relative">
+        <div class="text-center mb-4">
+            <small class="eyebrow">Ma bibliothèque</small>
+            <h1 class="font-serif display-4 fw-semibold mt-2 mb-3">{{ totalInLibrary }} livre{{ totalInLibrary > 1 ? 's' }}, <em class="fst-italic text-primary">soigneusement rangé{{ totalInLibrary > 1 ? 's' }}</em>.</h1>
+            <p class="text-mute fs-5 mb-4">Cherchez un titre, un auteur, un genre — ou parcourez vos étagères.</p>
+        </div>
+        <form method="get" action="{{ path('app_library') }}" class="search-wrap">
+            {% if filter.sort != 'recent' %}<input type="hidden" name="sort" value="{{ filter.sort }}">{% endif %}
+            <i class="bi bi-search"></i>
+            <input type="search" name="q" class="search-input" placeholder="Chercher dans ma bibliothèque…" value="{{ filter.query }}">
+            <kbd>↵</kbd>
+        </form>
     </div>
+</header>
+
+<main class="container pb-5">
+    <div class="row g-4">
+
+        <aside class="col-lg-3 d-none d-lg-block">
+            <div class="filter-sticky">
+                <div class="filter-card">
+                    {{ include('library/_filters.html.twig') }}
+                </div>
+            </div>
+        </aside>
+
+        <section class="col-lg-9">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <button class="btn btn-soft rounded-pill d-lg-none" data-bs-toggle="offcanvas" data-bs-target="#filtersMobile"><i class="bi bi-sliders"></i> Filtres</button>
+                    <span class="text-mute small">{{ page.total }} livre{{ page.total > 1 ? 's' }} affiché{{ page.total > 1 ? 's' }}{% if not filter.isEmpty %} (filtré){% endif %}</span>
+                </div>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <div class="view-toggle">
+                        <button type="button" class="active" aria-label="Vue grille"><i class="bi bi-grid-fill"></i></button>
+                        <button type="button" aria-label="Vue liste"><i class="bi bi-list-ul"></i></button>
+                    </div>
+                    <div class="dropdown">
+                        <button class="sort-btn dropdown-toggle d-inline-flex align-items-center gap-2" data-bs-toggle="dropdown"><i class="bi bi-sort-down"></i> Trier : <strong>{{ sort_labels[filter.sort] }}</strong></button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm rounded-4 border-0 p-2">
+                            {% for value, label in sort_labels %}
+                                <li><a class="dropdown-item rounded-3 py-2 {{ filter.sort == value ? 'active' }}" href="{{ path('app_library', filter.toQueryParams|filter((v, k) => k != 'sort')|merge(value == 'recent' ? {} : {sort: value})) }}">{{ label }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            {{ include('library/_active_chips.html.twig') }}
+
+            {{ include('library/_grid.html.twig') }}
+
+            {{ include('_partials/pagination.html.twig', {page: page, route: 'app_library', params: filter.toQueryParams}) }}
+        </section>
+    </div>
+</main>
+
+<div class="offcanvas offcanvas-start" tabindex="-1" id="filtersMobile">
+    <div class="offcanvas-header border-bottom">
+        <h5 class="offcanvas-title font-serif fw-semibold">Filtres</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+    </div>
+    <div class="offcanvas-body">
+        {{ include('library/_filters.html.twig') }}
+    </div>
+</div>
 {% endblock %}

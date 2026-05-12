@@ -39,6 +39,10 @@
   &.blob--soft { filter: blur(60px); opacity: .55; }
 }
 
+// Generic page-header blobs (library / book search headers)
+.page-blob--1 { top: -100px; left: -120px; width: 420px; height: 420px; background: #FCE4EC; }
+.page-blob--2 { top: -60px; right: -80px; width: 380px; height: 380px; background: #E0D4F7; }
+
 // Numbered step circle ("how it works")
 .step-num {
   width: 44px;

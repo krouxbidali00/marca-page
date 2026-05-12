@@ -1,0 +1,30 @@
+{#
+  Renders a book cover. Params:
+    book        — App\Entity\Book
+    size        — 'lg' (default, grid card 2:3) | 'xs' | 'sm' | 'md' | 'hero'
+    extra_class — optional extra CSS classes
+    show_text   — whether to render the title/author overlay on generated covers (default true)
+#}
+{% set size = size|default('lg') %}
+{% set extra_class = extra_class|default('') %}
+{% set show_text = show_text is defined ? show_text : true %}
+{% if book.hasThumbnail %}
+    <div class="cover cover--{{ size }} {{ extra_class }}">
+        <span class="spine"></span>
+        <img class="cover-img" src="{{ book.thumbnailUrl }}" alt="Couverture de {{ book.title }}" loading="lazy">
+    </div>
+{% else %}
+    <div class="cover cover--{{ size }} cover--theme-{{ book.coverTheme }} {{ extra_class }}">
+        <span class="spine"></span>
+        <div class="deco"></div>
+        {% if show_text %}
+            <div class="body">
+                <div class="author-c">{{ book.authors|first|default('') }}</div>
+                <div>
+                    <div class="title-c">{{ book.title }}</div>
+                    {% if book.publishedYear %}<div class="pub">{{ book.publishedYear }}</div>{% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endif %}

@@ -1,0 +1,48 @@
+{# Active-filter chips, each a link that removes just that value.
+   Params: filter (App\Dto\LibraryFilter) #}
+{% set base = filter.toQueryParams %}
+{% set chips = [] %}
+
+{% if filter.query %}
+    {% set chips = chips|merge([{label: '« ' ~ filter.query ~ ' »', params: base|filter((v, k) => k != 'q')}]) %}
+{% endif %}
+
+{% for status in filter.readingStatuses %}
+    {% set remaining = filter.readingStatuses|filter(s => s != status)|map(s => s.value) %}
+    {% set p = base|filter((v, k) => k != 'reading') %}
+    {% if remaining|length %}{% set p = p|merge({reading: remaining}) %}{% endif %}
+    {% set chips = chips|merge([{label: status.label, params: p}]) %}
+{% endfor %}
+
+{% for status in filter.purchaseStatuses %}
+    {% set remaining = filter.purchaseStatuses|filter(s => s != status)|map(s => s.value) %}
+    {% set p = base|filter((v, k) => k != 'purchase') %}
+    {% if remaining|length %}{% set p = p|merge({purchase: remaining}) %}{% endif %}
+    {% set chips = chips|merge([{label: status.label, params: p}]) %}
+{% endfor %}
+
+{% for cat in filter.categories %}
+    {% set remaining = filter.categories|filter(c => c != cat) %}
+    {% set p = base|filter((v, k) => k != 'category') %}
+    {% if remaining|length %}{% set p = p|merge({category: remaining}) %}{% endif %}
+    {% set chips = chips|merge([{label: cat, params: p}]) %}
+{% endfor %}
+
+{% if filter.minRating %}
+    {% set chips = chips|merge([{label: filter.minRating ~ '★ et +', params: base|filter((v, k) => k != 'minRating')}]) %}
+{% endif %}
+{% if filter.maxPages %}
+    {% set chips = chips|merge([{label: '≤ ' ~ filter.maxPages ~ ' pages', params: base|filter((v, k) => k != 'maxPages')}]) %}
+{% endif %}
+{% if filter.shelfId %}
+    {% set chips = chips|merge([{label: 'Étagère', params: base|filter((v, k) => k != 'shelf')}]) %}
+{% endif %}
+
+{% if chips|length %}
+    <div class="d-flex flex-wrap gap-2 mb-4 align-items-center">
+        {% for chip in chips %}
+            <a href="{{ path('app_library', chip.params) }}" class="chip chip-active text-decoration-none text-ink">{{ chip.label }} <i class="bi bi-x ms-1"></i></a>
+        {% endfor %}
+        <a href="{{ path('app_library') }}" class="small text-mute text-decoration-none">Réinitialiser</a>
+    </div>
+{% endif %}

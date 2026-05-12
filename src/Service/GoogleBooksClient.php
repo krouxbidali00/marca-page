@@ -42,7 +42,7 @@ class GoogleBooksClient implements GoogleBooksClientInterface
 
     public function getVolume(string $volumeId): GoogleBookResult
     {
-        $data = $this->request(self::BASE.'/'.rawurlencode($volumeId), []);
+        $data = $this->request(self::BASE . '/' . rawurlencode($volumeId), []);
         $result = $this->mapItem($data);
         if ($result === null) {
             throw new GoogleBooksException(\sprintf('Volume "%s" is missing required data.', $volumeId));

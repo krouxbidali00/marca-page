@@ -1,0 +1,5 @@
+{# Params: status (App\Enum\ReadingStatus), book (optional — adds "· page X / Y") #}
+<span class="pill {{ status.pillClass }}">
+    {% if status.value == 'reading' %}<span class="pill-dot"></span>{% else %}<i class="bi bi-bookmark"></i>{% endif %}
+    {{ status.label }}{% if book is defined and book.currentPage and book.pageCount %} · page {{ book.currentPage }} / {{ book.pageCount }}{% endif %}
+</span>

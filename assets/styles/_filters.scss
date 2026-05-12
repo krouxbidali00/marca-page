@@ -91,6 +91,13 @@
   font-size: .8rem;
 }
 
+.form-range { accent-color: #E89BB8; }
+
+.filter-sticky {
+  position: sticky;
+  top: 96px;
+}
+
 // Inline keyboard hint
 .kbd-inline {
   background: #fff;

@@ -36,7 +36,7 @@ class RegistrationController extends AbstractController
 
             $security->login($user, 'form_login', 'main');
 
-            $this->addFlash('success', 'Bienvenue, '.$user->getDisplayName().' ! Votre bibliothèque est prête.');
+            $this->addFlash('success', 'Bienvenue, ' . $user->getDisplayName() . ' ! Votre bibliothèque est prête.');
 
             return $this->redirectToRoute('app_library');
         }
