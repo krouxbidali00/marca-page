@@ -1,11 +1,8 @@
-# Enable stateless CSRF protection for forms and logins/logouts
+# Classic, session-based CSRF protection for forms and logins/logouts.
+# Tokens are rendered server-side so the app works without JavaScript.
 framework:
     form:
         csrf_protection:
             token_id: submit
 
-    csrf_protection:
-        stateless_token_ids:
-            - submit
-            - authenticate
-            - logout
+    csrf_protection: ~
