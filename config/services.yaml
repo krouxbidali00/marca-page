@@ -22,3 +22,8 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
     App\Service\GoogleBooksClientInterface: '@App\Service\GoogleBooksClient'
+
+when@test:
+    services:
+        App\Tests\Double\FakeGoogleBooksClient: ~
+        App\Service\GoogleBooksClientInterface: '@App\Tests\Double\FakeGoogleBooksClient'
