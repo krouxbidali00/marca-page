@@ -35,7 +35,9 @@ class LibraryController extends AbstractController
             }
         }
 
-        return $this->render('library/index.html.twig', [
+        $template = $request->isXmlHttpRequest() ? 'library/_results.html.twig' : 'library/index.html.twig';
+
+        return $this->render($template, [
             'page' => $page,
             'filter' => $filter,
             'shelves' => $shelves->findBy(['owner' => $user], ['name' => 'ASC']),
