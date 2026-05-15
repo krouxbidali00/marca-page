@@ -35,6 +35,7 @@ PHPUnit 13. The test DB (`app_test`) must exist with the schema applied:
 ```bash
 docker compose exec php bin/console --env=test doctrine:database:create --if-not-exists
 docker compose exec php bin/console --env=test doctrine:migrations:migrate --no-interaction
+docker compose exec php bin/console sass:build                        # required: functional tests resolve var/sass/app.output.css
 docker compose exec php bin/phpunit                                   # all tests
 docker compose exec php bin/phpunit tests/Controller/BookImportTest.php   # one file
 docker compose exec php bin/phpunit --filter testImportAddsBookToLibrary  # one test
