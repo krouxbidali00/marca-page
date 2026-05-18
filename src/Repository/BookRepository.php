@@ -223,4 +223,50 @@ class BookRepository extends ServiceEntityRepository
         }
         return $hist;
     }
+
+    /**
+     * @return list<array{name: string, count: int}>
+     */
+    public function topAuthors(User $owner, ?\DateTimeImmutable $since, int $limit): array
+    {
+        return $this->topFromJsonArray($owner, $since, 'authors', $limit);
+    }
+
+    /**
+     * @return list<array{name: string, count: int}>
+     */
+    public function topCategories(User $owner, ?\DateTimeImmutable $since, int $limit): array
+    {
+        return $this->topFromJsonArray($owner, $since, 'categories', $limit);
+    }
+
+    /**
+     * @return list<array{name: string, count: int}>
+     */
+    private function topFromJsonArray(User $owner, ?\DateTimeImmutable $since, string $field, int $limit): array
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->select('b.' . $field . ' AS items')
+            ->andWhere('b.owner = :owner')->setParameter('owner', $owner);
+        if ($since !== null) {
+            $qb->andWhere('b.addedAt >= :since')->setParameter('since', $since);
+        }
+
+        $tally = [];
+        foreach ($qb->getQuery()->getResult() as $row) {
+            foreach ((array) $row['items'] as $value) {
+                $name = trim((string) $value);
+                if ($name === '') {
+                    continue;
+                }
+                $tally[$name] = ($tally[$name] ?? 0) + 1;
+            }
+        }
+        arsort($tally);
+        $top = [];
+        foreach (\array_slice($tally, 0, $limit, preserve_keys: true) as $name => $count) {
+            $top[] = ['name' => $name, 'count' => $count];
+        }
+        return $top;
+    }
 }

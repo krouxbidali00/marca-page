@@ -119,4 +119,56 @@ class BookRepositoryStatsTest extends KernelTestCase
         $hist = $this->books->ratingHistogram($this->user, null);
         self::assertSame([1 => 0, 2 => 0, 3 => 2, 4 => 0, 5 => 1], $hist);
     }
+
+    public function testTopAuthorsCountsRepeatedAuthors(): void
+    {
+        $a = $this->book('A');
+        $b = $this->book('B');
+        $c = $this->book('C');
+        $a->setAuthors(['Camus', 'Sartre']);
+        $b->setAuthors(['Camus']);
+        $c->setAuthors(['Sagan']);
+        $this->em->flush();
+
+        $top = $this->books->topAuthors($this->user, null, 10);
+        self::assertSame(['name' => 'Camus', 'count' => 2], $top[0]);
+        $names = array_column($top, 'name');
+        self::assertContains('Sartre', $names);
+        self::assertContains('Sagan', $names);
+    }
+
+    public function testTopAuthorsRespectsLimit(): void
+    {
+        for ($i = 0; $i < 5; $i++) {
+            $b = $this->book('B' . $i);
+            $b->setAuthors(['Author ' . $i]);
+        }
+        $this->em->flush();
+        self::assertCount(3, $this->books->topAuthors($this->user, null, 3));
+    }
+
+    public function testTopAuthorsFiltersBySince(): void
+    {
+        $old = $this->book('Old', addedAt: '2020-01-01 12:00:00');
+        $new = $this->book('New', addedAt: 'now');
+        $old->setAuthors(['Old Author']);
+        $new->setAuthors(['New Author']);
+        $this->em->flush();
+
+        $top = $this->books->topAuthors($this->user, new \DateTimeImmutable('-1 day'), 10);
+        self::assertCount(1, $top);
+        self::assertSame('New Author', $top[0]['name']);
+    }
+
+    public function testTopCategoriesCountsRepeatedCategories(): void
+    {
+        $a = $this->book('A');
+        $b = $this->book('B');
+        $a->setCategories(['Roman', 'Essai']);
+        $b->setCategories(['Roman']);
+        $this->em->flush();
+
+        $top = $this->books->topCategories($this->user, null, 10);
+        self::assertSame(['name' => 'Roman', 'count' => 2], $top[0]);
+    }
 }
