@@ -27,6 +27,3 @@ when@test:
     services:
         App\Tests\Double\FakeGoogleBooksClient: ~
         App\Service\GoogleBooksClientInterface: '@App\Tests\Double\FakeGoogleBooksClient'
-        App\Service\StatsAggregator:
-            autowire: true
-            public: true
