@@ -314,4 +314,31 @@ class SettingsControllerTest extends WebTestCase
         self::assertArrayHasKey('user', $payload);
         self::assertSame('exp1@example.test', $payload['user']['email']);
     }
+
+    public function testEmailChangeRejectsExistingEmail(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+
+        $taken = (new User())->setEmail('taken@example.test')->setDisplayName('Taken')->setPassword('Secret123');
+        $em->persist($taken);
+
+        $me = (new User())->setEmail('me-uniq@example.test')->setDisplayName('Me')->setPassword('Secret123');
+        $em->persist($me);
+        $em->flush();
+        $client->loginUser($me);
+
+        $token = $this->fetchCsrfToken($client, 'settings_profile');
+        $client->request('POST', '/settings/profile', [
+            '_token' => $token,
+            'displayName' => 'Me',
+            'email' => 'taken@example.test',
+            'currentPassword' => 'Secret123',
+        ]);
+        self::assertResponseRedirects('/settings');
+
+        $em->clear();
+        $stillMe = $em->getRepository(User::class)->findOneBy(['email' => 'me-uniq@example.test']);
+        self::assertNotNull($stillMe, 'Current user email must remain unchanged when target is already in use');
+    }
 }
