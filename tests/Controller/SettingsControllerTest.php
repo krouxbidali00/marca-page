@@ -30,19 +30,14 @@ class SettingsControllerTest extends WebTestCase
         self::assertStringContainsString('Paramètres', (string) $client->getResponse()->getContent());
     }
 
-    private function fetchProfileCsrfToken(KernelBrowser $client): string
+    private function fetchCsrfToken(KernelBrowser $client, string $tokenId): string
     {
-        $crawler = $client->request('GET', '/settings');
-        $input = $crawler->filter('input[name="_token"]');
-        if ($input->count() > 0) {
-            return (string) $input->first()->attr('value');
-        }
-
-        // Template doesn't expose a profile form yet (added in a later task).
+        // Template doesn't expose a form for this token yet (added in a later task).
         // Seed the CSRF token directly into the session the test client is using.
+        $client->request('GET', '/settings');
         $session = $client->getRequest()->getSession();
         $token = bin2hex(random_bytes(16));
-        $session->set('_csrf/settings_profile', $token);
+        $session->set('_csrf/' . $tokenId, $token);
         $session->save();
         return $token;
     }
@@ -56,7 +51,7 @@ class SettingsControllerTest extends WebTestCase
         $em->flush();
         $client->loginUser($user);
 
-        $token = $this->fetchProfileCsrfToken($client);
+        $token = $this->fetchCsrfToken($client, 'settings_profile');
 
         $client->request('POST', '/settings/profile', [
             '_token' => $token,
@@ -80,7 +75,7 @@ class SettingsControllerTest extends WebTestCase
         $em->flush();
         $client->loginUser($user);
 
-        $token = $this->fetchProfileCsrfToken($client);
+        $token = $this->fetchCsrfToken($client, 'settings_profile');
 
         $client->request('POST', '/settings/profile', [
             '_token' => $token,
@@ -104,7 +99,7 @@ class SettingsControllerTest extends WebTestCase
         $em->flush();
         $client->loginUser($user);
 
-        $token = $this->fetchProfileCsrfToken($client);
+        $token = $this->fetchCsrfToken($client, 'settings_profile');
 
         $client->request('POST', '/settings/profile', [
             '_token' => $token,
@@ -128,7 +123,7 @@ class SettingsControllerTest extends WebTestCase
         $em->flush();
         $client->loginUser($user);
 
-        $token = $this->fetchProfileCsrfToken($client);
+        $token = $this->fetchCsrfToken($client, 'settings_profile');
 
         $client->request('POST', '/settings/profile', [
             '_token' => $token,
@@ -163,5 +158,97 @@ class SettingsControllerTest extends WebTestCase
         $em->clear();
         $reloaded = $em->getRepository(User::class)->findOneBy(['email' => 'p5@example.test']);
         self::assertSame('Five', $reloaded->getDisplayName());
+    }
+
+    public function testPasswordWrongCurrent(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $user = (new User())->setEmail('pw1@example.test')->setDisplayName('PW1')->setPassword('Secret123');
+        $em->persist($user);
+        $em->flush();
+        $client->loginUser($user);
+
+        $token = $this->fetchCsrfToken($client, 'settings_password');
+        $client->request('POST', '/settings/password', [
+            '_token' => $token,
+            'currentPassword' => 'WrongPass',
+            'newPassword' => 'NewSecret456',
+            'confirmPassword' => 'NewSecret456',
+        ]);
+        self::assertResponseRedirects('/settings');
+
+        $em->clear();
+        $reloaded = $em->getRepository(User::class)->findOneBy(['email' => 'pw1@example.test']);
+        self::assertSame('Secret123', $reloaded->getPassword());
+    }
+
+    public function testPasswordMismatchConfirmation(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $user = (new User())->setEmail('pw2@example.test')->setDisplayName('PW2')->setPassword('Secret123');
+        $em->persist($user);
+        $em->flush();
+        $client->loginUser($user);
+
+        $token = $this->fetchCsrfToken($client, 'settings_password');
+        $client->request('POST', '/settings/password', [
+            '_token' => $token,
+            'currentPassword' => 'Secret123',
+            'newPassword' => 'NewSecret456',
+            'confirmPassword' => 'Different789',
+        ]);
+        self::assertResponseRedirects('/settings');
+
+        $em->clear();
+        $reloaded = $em->getRepository(User::class)->findOneBy(['email' => 'pw2@example.test']);
+        self::assertSame('Secret123', $reloaded->getPassword());
+    }
+
+    public function testPasswordTooShort(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $user = (new User())->setEmail('pw3@example.test')->setDisplayName('PW3')->setPassword('Secret123');
+        $em->persist($user);
+        $em->flush();
+        $client->loginUser($user);
+
+        $token = $this->fetchCsrfToken($client, 'settings_password');
+        $client->request('POST', '/settings/password', [
+            '_token' => $token,
+            'currentPassword' => 'Secret123',
+            'newPassword' => 'short',
+            'confirmPassword' => 'short',
+        ]);
+        self::assertResponseRedirects('/settings');
+
+        $em->clear();
+        $reloaded = $em->getRepository(User::class)->findOneBy(['email' => 'pw3@example.test']);
+        self::assertSame('Secret123', $reloaded->getPassword());
+    }
+
+    public function testPasswordChangeSuccess(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $user = (new User())->setEmail('pw4@example.test')->setDisplayName('PW4')->setPassword('Secret123');
+        $em->persist($user);
+        $em->flush();
+        $client->loginUser($user);
+
+        $token = $this->fetchCsrfToken($client, 'settings_password');
+        $client->request('POST', '/settings/password', [
+            '_token' => $token,
+            'currentPassword' => 'Secret123',
+            'newPassword' => 'NewSecret456',
+            'confirmPassword' => 'NewSecret456',
+        ]);
+        self::assertResponseRedirects('/settings');
+
+        $em->clear();
+        $reloaded = $em->getRepository(User::class)->findOneBy(['email' => 'pw4@example.test']);
+        self::assertSame('NewSecret456', $reloaded->getPassword());
     }
 }

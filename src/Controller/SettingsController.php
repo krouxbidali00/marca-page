@@ -65,4 +65,42 @@ class SettingsController extends AbstractController
         $this->addFlash('success', 'Profil mis à jour.');
         return $this->redirectToRoute('app_settings');
     }
+
+    #[Route('/settings/password', name: 'app_settings_password', methods: ['POST'])]
+    public function changePassword(
+        Request $request,
+        UserPasswordHasherInterface $hasher,
+        EntityManagerInterface $em,
+    ): Response {
+        /** @var User $user */
+        $user = $this->getUser();
+        $token = (string) $request->request->get('_token', '');
+        if (!$this->isCsrfTokenValid('settings_password', $token)) {
+            $this->addFlash('danger', 'Jeton de sécurité invalide. Réessayez.');
+            return $this->redirectToRoute('app_settings');
+        }
+
+        $current = (string) $request->request->get('currentPassword', '');
+        $new = (string) $request->request->get('newPassword', '');
+        $confirm = (string) $request->request->get('confirmPassword', '');
+
+        if (!$hasher->isPasswordValid($user, $current)) {
+            $this->addFlash('danger', 'Mot de passe actuel invalide.');
+            return $this->redirectToRoute('app_settings');
+        }
+        if (\strlen($new) < 8) {
+            $this->addFlash('danger', 'Le nouveau mot de passe doit faire au moins 8 caractères.');
+            return $this->redirectToRoute('app_settings');
+        }
+        if ($new !== $confirm) {
+            $this->addFlash('danger', 'La confirmation ne correspond pas au nouveau mot de passe.');
+            return $this->redirectToRoute('app_settings');
+        }
+
+        $user->setPassword($hasher->hashPassword($user, $new));
+        $em->flush();
+
+        $this->addFlash('success', 'Mot de passe mis à jour.');
+        return $this->redirectToRoute('app_settings');
+    }
 }
