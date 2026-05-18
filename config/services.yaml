@@ -27,3 +27,6 @@ when@test:
     services:
         App\Tests\Double\FakeGoogleBooksClient: ~
         App\Service\GoogleBooksClientInterface: '@App\Tests\Double\FakeGoogleBooksClient'
+        App\Service\LibraryExporter:
+            autowire: true
+            public: true
