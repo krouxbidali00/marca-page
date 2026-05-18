@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Statistiques · Marca-Page{% endblock %}
+{% block navbar %}{% include '_partials/navbar_app.html.twig' %}{% endblock %}
+{% block footer %}{% include '_partials/footer_compact.html.twig' %}{% endblock %}
+
+{% block body %}
+<header class="position-relative overflow-hidden">
+    <div class="blob page-blob--1"></div>
+    <div class="blob page-blob--2"></div>
+    <div class="container py-5 position-relative">
+        <div class="text-center mb-4">
+            <small class="eyebrow">Statistiques</small>
+            <h1 class="font-serif display-4 fw-semibold mt-2 mb-3">Vos lectures, <em class="fst-italic text-primary">en chiffres</em>.</h1>
+        </div>
+        {{ include('stats/_hero_counters.html.twig') }}
+        {{ include('stats/_period_pills.html.twig') }}
+    </div>
+</header>
+
+<main class="container pb-5">
+    <div class="stats-grid">
+        {{ include('stats/_status_card.html.twig') }}
+        {{ include('stats/_rating_card.html.twig') }}
+        {{ include('stats/_top_authors_card.html.twig') }}
+        {{ include('stats/_top_categories_card.html.twig') }}
+        {{ include('stats/_activity_card.html.twig') }}
+    </div>
+</main>
+{% endblock %}

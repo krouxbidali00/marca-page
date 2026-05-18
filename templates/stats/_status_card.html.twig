@@ -1,0 +1,26 @@
+{# Params: stats (StatsResult) #}
+{% set status_data = {
+    labels: ['À lire', 'En cours', 'Terminé', 'Abandonné'],
+    values: [
+        stats.countByStatus.to_read|default(0),
+        stats.countByStatus.reading|default(0),
+        stats.countByStatus.finished|default(0),
+        stats.countByStatus.abandoned|default(0)
+    ],
+    colors: ['#E8C9D6', '#F4D9B8', '#C8DDC4', '#E5E1DE']
+} %}
+<div class="stat-card" data-controller="stats-chart"
+     data-stats-chart-type-value="doughnut"
+     data-stats-chart-data-value="{{ status_data|json_encode|e('html_attr') }}">
+    <h3>Statuts de lecture</h3>
+    <div class="stat-card__chart"><canvas data-stats-chart-target="canvas"></canvas></div>
+    <ul class="stat-legend list-unstyled mt-3 mb-0">
+        {% for i, label in status_data.labels %}
+            <li class="d-flex align-items-center gap-2">
+                <span class="stat-legend__dot" style="background:{{ status_data.colors[i] }}"></span>
+                <span class="flex-grow-1">{{ label }}</span>
+                <span class="fw-semibold">{{ status_data.values[i] }}</span>
+            </li>
+        {% endfor %}
+    </ul>
+</div>

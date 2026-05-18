@@ -1,0 +1,12 @@
+{# Params: stats (StatsResult) #}
+{% set authors_data = {
+    labels: stats.topAuthors|map(a => a.name),
+    values: stats.topAuthors|map(a => a.count),
+    colors: ['#E89BB8']
+} %}
+<div class="stat-card" data-controller="stats-chart"
+     data-stats-chart-type-value="barHorizontal"
+     data-stats-chart-data-value="{{ authors_data|json_encode|e('html_attr') }}">
+    <h3>Top auteurs</h3>
+    <div class="stat-card__chart"><canvas data-stats-chart-target="canvas"></canvas></div>
+</div>

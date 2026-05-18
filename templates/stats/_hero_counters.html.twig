@@ -1,0 +1,15 @@
+{# Params: stats (App\Dto\StatsResult) #}
+<div class="stat-hero d-flex flex-wrap justify-content-center gap-4 gap-md-5 my-4">
+    <div class="stat-hero-counter text-center">
+        <div class="font-serif display-5 fw-semibold text-primary">{{ stats.totalBooks }}</div>
+        <small class="text-mute">livre{{ stats.totalBooks > 1 ? 's' }}</small>
+    </div>
+    <div class="stat-hero-counter text-center">
+        <div class="font-serif display-5 fw-semibold text-primary">{{ stats.totalPages|number_format(0, ',', ' ') }}</div>
+        <small class="text-mute">page{{ stats.totalPages > 1 ? 's' }}</small>
+    </div>
+    <div class="stat-hero-counter text-center">
+        <div class="font-serif display-5 fw-semibold text-primary">{{ stats.totalQuotes }}</div>
+        <small class="text-mute">citation{{ stats.totalQuotes > 1 ? 's' }}</small>
+    </div>
+</div>
