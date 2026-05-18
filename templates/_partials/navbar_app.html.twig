@@ -15,7 +15,7 @@
                 <li class="nav-item"><a class="nav-link {{ route == 'app_home' ? 'active' }}" href="{{ path('app_home') }}">Accueil</a></li>
                 <li class="nav-item"><a class="nav-link {{ route starts with 'app_library' or route starts with 'app_book' ? 'active' }}" href="{{ path('app_library') }}">Bibliothèque</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Étagères</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">Statistiques</a></li>
+                <li class="nav-item"><a class="nav-link {{ route starts with 'app_stats' ? 'active' }}" href="{{ path('app_stats') }}">Statistiques</a></li>
             </ul>
             <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
                 <a href="{{ path('app_book_search') }}" class="btn btn-primary rounded-pill px-3 d-inline-flex align-items-center gap-2"><i class="bi bi-plus-lg"></i> Ajouter un livre</a>
