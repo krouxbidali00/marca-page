@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Service\LibraryExporter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -134,5 +136,18 @@ class SettingsController extends AbstractController
         $session->invalidate();
 
         return $this->redirectToRoute('app_home');
+    }
+
+    #[Route('/settings/export', name: 'app_settings_export', methods: ['GET'])]
+    public function export(LibraryExporter $exporter): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        $payload = $exporter->exportForUser($user);
+
+        $response = new JsonResponse($payload);
+        $filename = 'marca-page-export-' . (new \DateTimeImmutable())->format('Y-m-d') . '.json';
+        $response->headers->set('Content-Disposition', sprintf('attachment; filename="%s"', $filename));
+        return $response;
     }
 }

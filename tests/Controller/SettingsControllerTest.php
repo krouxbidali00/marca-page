@@ -293,4 +293,25 @@ class SettingsControllerTest extends WebTestCase
         $gone = $em->getRepository(User::class)->findOneBy(['email' => 'del2@example.test']);
         self::assertNull($gone, 'User must be deleted from the database');
     }
+
+    public function testExportReturnsJsonAttachment(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $user = (new User())->setEmail('exp1@example.test')->setDisplayName('Exp1')->setPassword('Secret123');
+        $em->persist($user);
+        $em->flush();
+        $client->loginUser($user);
+
+        $client->request('GET', '/settings/export');
+        self::assertResponseIsSuccessful();
+        self::assertSame('application/json', $client->getResponse()->headers->get('Content-Type'));
+        self::assertStringStartsWith('attachment', (string) $client->getResponse()->headers->get('Content-Disposition'));
+
+        $payload = json_decode((string) $client->getResponse()->getContent(), true);
+        self::assertIsArray($payload);
+        self::assertArrayHasKey('books', $payload);
+        self::assertArrayHasKey('user', $payload);
+        self::assertSame('exp1@example.test', $payload['user']['email']);
+    }
 }
