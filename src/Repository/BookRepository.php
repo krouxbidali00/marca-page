@@ -137,4 +137,90 @@ class BookRepository extends ServiceEntityRepository
 
         return \array_slice(array_values($byId), 0, $limit);
     }
+
+    public function sumPages(User $owner): int
+    {
+        return (int) $this->createQueryBuilder('b')
+            ->select('COALESCE(SUM(b.pageCount), 0)')
+            ->andWhere('b.owner = :owner')->setParameter('owner', $owner)
+            ->getQuery()->getSingleScalarResult();
+    }
+
+    public function countAddedSince(User $owner, ?\DateTimeImmutable $since): int
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->select('COUNT(b.id)')
+            ->andWhere('b.owner = :owner')->setParameter('owner', $owner);
+        if ($since !== null) {
+            $qb->andWhere('b.addedAt >= :since')->setParameter('since', $since);
+        }
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @return array<string,int> ReadingStatus->value => count, all 4 keys present (zero-filled).
+     */
+    public function countByStatus(User $owner, ?\DateTimeImmutable $since): array
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->select('b.readingStatus AS status, COUNT(b.id) AS c')
+            ->andWhere('b.owner = :owner')->setParameter('owner', $owner)
+            ->groupBy('b.readingStatus');
+        if ($since !== null) {
+            $qb->andWhere('b.addedAt >= :since')->setParameter('since', $since);
+        }
+        $rows = $qb->getQuery()->getResult();
+
+        $counts = ['to_read' => 0, 'reading' => 0, 'finished' => 0, 'abandoned' => 0];
+        foreach ($rows as $row) {
+            $key = $row['status'] instanceof \App\Enum\ReadingStatus ? $row['status']->value : (string) $row['status'];
+            $counts[$key] = (int) $row['c'];
+        }
+        return $counts;
+    }
+
+    public function countRated(User $owner, ?\DateTimeImmutable $since): int
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->select('COUNT(b.id)')
+            ->andWhere('b.owner = :owner')->setParameter('owner', $owner)
+            ->andWhere('b.rating IS NOT NULL');
+        if ($since !== null) {
+            $qb->andWhere('b.addedAt >= :since')->setParameter('since', $since);
+        }
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    public function averageRating(User $owner, ?\DateTimeImmutable $since): ?float
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->select('AVG(b.rating)')
+            ->andWhere('b.owner = :owner')->setParameter('owner', $owner)
+            ->andWhere('b.rating IS NOT NULL');
+        if ($since !== null) {
+            $qb->andWhere('b.addedAt >= :since')->setParameter('since', $since);
+        }
+        $value = $qb->getQuery()->getSingleScalarResult();
+        return $value === null ? null : (float) $value;
+    }
+
+    /**
+     * @return array<int,int> 1..5 => count (all 5 buckets present).
+     */
+    public function ratingHistogram(User $owner, ?\DateTimeImmutable $since): array
+    {
+        $qb = $this->createQueryBuilder('b')
+            ->select('b.rating AS rating, COUNT(b.id) AS c')
+            ->andWhere('b.owner = :owner')->setParameter('owner', $owner)
+            ->andWhere('b.rating IS NOT NULL')
+            ->groupBy('b.rating');
+        if ($since !== null) {
+            $qb->andWhere('b.addedAt >= :since')->setParameter('since', $since);
+        }
+        $hist = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
+        foreach ($qb->getQuery()->getResult() as $row) {
+            $hist[(int) $row['rating']] = (int) $row['c'];
+        }
+        return $hist;
+    }
 }
