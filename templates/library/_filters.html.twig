@@ -1,12 +1,15 @@
 {# Filter form, used both in the desktop sidebar and the mobile offcanvas.
    Params: filter (App\Dto\LibraryFilter), shelves, categoryOptions, readingStatuses, purchaseStatuses #}
-<form method="get" action="{{ path('app_library') }}" class="d-flex flex-column gap-4">
+<form method="get" action="{{ path('app_library') }}" class="d-flex flex-column gap-4"
+      data-library-target="form"
+      data-action="submit->library#submitFilters">
     {% if filter.query %}<input type="hidden" name="q" value="{{ filter.query }}">{% endif %}
     {% if filter.sort != 'recent' %}<input type="hidden" name="sort" value="{{ filter.sort }}">{% endif %}
 
     <div class="d-flex justify-content-between align-items-center">
         <h6 class="mb-0 font-serif fw-semibold">Filtres</h6>
-        <a href="{{ path('app_library') }}" class="small text-mute text-decoration-none">Tout effacer</a>
+        <a href="{{ path('app_library') }}" class="small text-mute text-decoration-none"
+           data-action="library#resetAll">Tout effacer</a>
     </div>
 
     <div>
@@ -14,7 +17,9 @@
         <div class="d-flex flex-column gap-1">
             {% for status in readingStatuses %}
                 <label class="form-check filter-check d-flex align-items-center">
-                    <input type="checkbox" class="form-check-input me-2" name="reading[]" value="{{ status.value }}" {{ filter.hasReadingStatus(status) ? 'checked' }}>
+                    <input type="checkbox" class="form-check-input me-2" name="reading[]" value="{{ status.value }}"
+                           data-action="change->library#applyFilters"
+                           {{ filter.hasReadingStatus(status) ? 'checked' }}>
                     {{ status.label }}
                 </label>
             {% endfor %}
@@ -26,7 +31,9 @@
         <div class="d-flex flex-column gap-1">
             {% for status in purchaseStatuses %}
                 <label class="form-check filter-check d-flex align-items-center">
-                    <input type="checkbox" class="form-check-input me-2" name="purchase[]" value="{{ status.value }}" {{ filter.hasPurchaseStatus(status) ? 'checked' }}>
+                    <input type="checkbox" class="form-check-input me-2" name="purchase[]" value="{{ status.value }}"
+                           data-action="change->library#applyFilters"
+                           {{ filter.hasPurchaseStatus(status) ? 'checked' }}>
                     {{ status.label }}
                 </label>
             {% endfor %}
@@ -38,7 +45,9 @@
         <div class="d-flex flex-column gap-1">
             {% for cat in categoryOptions %}
                 <label class="form-check filter-check d-flex align-items-center">
-                    <input type="checkbox" class="form-check-input me-2" name="category[]" value="{{ cat }}" {{ filter.hasCategory(cat) ? 'checked' }}>
+                    <input type="checkbox" class="form-check-input me-2" name="category[]" value="{{ cat }}"
+                           data-action="change->library#applyFilters"
+                           {{ filter.hasCategory(cat) ? 'checked' }}>
                     {{ cat }}
                 </label>
             {% endfor %}
@@ -47,7 +56,8 @@
 
     <div>
         <label class="filter-label mb-2 d-block">Ma note minimale</label>
-        <select name="minRating" class="form-select rounded-pill">
+        <select name="minRating" class="form-select rounded-pill"
+                data-action="change->library#applyFilters">
             <option value="">Toutes les notes</option>
             {% for n in 1..5 %}
                 <option value="{{ n }}" {{ filter.minRating == n ? 'selected' }}>{{ n }} étoile{{ n > 1 ? 's' }} et plus</option>
@@ -58,14 +68,16 @@
     <div>
         <label class="filter-label mb-2 d-block">Nombre de pages maximum</label>
         <div class="d-flex justify-content-between small text-mute"><span>0</span><span>800+</span></div>
-        <input type="range" class="form-range" min="0" max="800" step="50" name="maxPages" value="{{ filter.maxPages ?? 800 }}">
+        <input type="range" class="form-range" min="0" max="800" step="50" name="maxPages" value="{{ filter.maxPages ?? 800 }}"
+               data-action="change->library#applyFilters">
         <small class="text-mute">{{ filter.maxPages ? 'Jusqu’à ' ~ filter.maxPages ~ ' pages' : 'Toutes les longueurs' }}</small>
     </div>
 
     {% if shelves|length %}
         <div>
             <label class="filter-label mb-2 d-block">Étagère</label>
-            <select name="shelf" class="form-select rounded-pill">
+            <select name="shelf" class="form-select rounded-pill"
+                    data-action="change->library#applyFilters">
                 <option value="">Toutes les étagères</option>
                 {% for shelf in shelves %}
                     <option value="{{ shelf.id }}" {{ filter.shelfId == shelf.id ? 'selected' }}>{{ shelf.name }}</option>
@@ -73,6 +85,4 @@
             </select>
         </div>
     {% endif %}
-
-    <button type="submit" class="btn btn-primary rounded-pill">Appliquer les filtres</button>
 </form>
