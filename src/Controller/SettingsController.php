@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_USER')]
@@ -102,5 +103,36 @@ class SettingsController extends AbstractController
 
         $this->addFlash('success', 'Mot de passe mis à jour.');
         return $this->redirectToRoute('app_settings');
+    }
+
+    #[Route('/settings/delete', name: 'app_settings_delete', methods: ['POST'])]
+    public function deleteAccount(
+        Request $request,
+        UserPasswordHasherInterface $hasher,
+        EntityManagerInterface $em,
+        TokenStorageInterface $tokenStorage,
+    ): Response {
+        /** @var User $user */
+        $user = $this->getUser();
+        $token = (string) $request->request->get('_token', '');
+        if (!$this->isCsrfTokenValid('settings_delete', $token)) {
+            $this->addFlash('danger', 'Jeton de sécurité invalide. Réessayez.');
+            return $this->redirectToRoute('app_settings');
+        }
+
+        $currentPassword = (string) $request->request->get('currentPassword', '');
+        if (!$hasher->isPasswordValid($user, $currentPassword)) {
+            $this->addFlash('danger', 'Mot de passe invalide. Le compte n\'a pas été supprimé.');
+            return $this->redirectToRoute('app_settings');
+        }
+
+        $em->remove($user);
+        $em->flush();
+
+        $tokenStorage->setToken(null);
+        $session = $request->getSession();
+        $session->invalidate();
+
+        return $this->redirectToRoute('app_home');
     }
 }

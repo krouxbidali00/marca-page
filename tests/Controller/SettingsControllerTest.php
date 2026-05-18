@@ -251,4 +251,46 @@ class SettingsControllerTest extends WebTestCase
         $reloaded = $em->getRepository(User::class)->findOneBy(['email' => 'pw4@example.test']);
         self::assertSame('NewSecret456', $reloaded->getPassword());
     }
+
+    public function testDeleteWrongPassword(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $user = (new User())->setEmail('del1@example.test')->setDisplayName('Del1')->setPassword('Secret123');
+        $em->persist($user);
+        $em->flush();
+        $client->loginUser($user);
+
+        $token = $this->fetchCsrfToken($client, 'settings_delete');
+        $client->request('POST', '/settings/delete', [
+            '_token' => $token,
+            'currentPassword' => 'WrongPass',
+        ]);
+        self::assertResponseRedirects('/settings');
+
+        $em->clear();
+        $stillHere = $em->getRepository(User::class)->findOneBy(['email' => 'del1@example.test']);
+        self::assertNotNull($stillHere, 'User must not be deleted with wrong password');
+    }
+
+    public function testDeleteSuccessRemovesUserAndRedirects(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $user = (new User())->setEmail('del2@example.test')->setDisplayName('Del2')->setPassword('Secret123');
+        $em->persist($user);
+        $em->flush();
+        $client->loginUser($user);
+
+        $token = $this->fetchCsrfToken($client, 'settings_delete');
+        $client->request('POST', '/settings/delete', [
+            '_token' => $token,
+            'currentPassword' => 'Secret123',
+        ]);
+        self::assertTrue($client->getResponse()->isRedirect());
+
+        $em->clear();
+        $gone = $em->getRepository(User::class)->findOneBy(['email' => 'del2@example.test']);
+        self::assertNull($gone, 'User must be deleted from the database');
+    }
 }
