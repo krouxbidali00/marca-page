@@ -1,0 +1,24 @@
+{# Params: stats (StatsResult) #}
+{% set rating_data = {
+    labels: ['1★', '2★', '3★', '4★', '5★'],
+    values: [
+        stats.ratingHistogram[1]|default(0),
+        stats.ratingHistogram[2]|default(0),
+        stats.ratingHistogram[3]|default(0),
+        stats.ratingHistogram[4]|default(0),
+        stats.ratingHistogram[5]|default(0)
+    ],
+    colors: ['#E89BB8', '#E89BB8', '#E89BB8', '#E89BB8', '#E89BB8']
+} %}
+<div class="stat-card" data-controller="stats-chart"
+     data-stats-chart-type-value="bar"
+     data-stats-chart-data-value="{{ rating_data|json_encode|e('html_attr') }}">
+    <h3>Répartition des notes</h3>
+    <div class="stat-card__chart"><canvas data-stats-chart-target="canvas"></canvas></div>
+    <div class="d-flex justify-content-between mt-3">
+        <small class="text-mute">{{ stats.totalRated }} note{{ stats.totalRated > 1 ? 's' }}</small>
+        {% if stats.averageRating is not null %}
+            <small class="fw-semibold">Moyenne : {{ stats.averageRating|number_format(1, ',') }}★</small>
+        {% endif %}
+    </div>
+</div>

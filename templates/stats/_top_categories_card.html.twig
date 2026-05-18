@@ -1,0 +1,12 @@
+{# Params: stats (StatsResult) #}
+{% set categories_data = {
+    labels: stats.topCategories|map(c => c.name),
+    values: stats.topCategories|map(c => c.count),
+    colors: ['#C8DDC4']
+} %}
+<div class="stat-card" data-controller="stats-chart"
+     data-stats-chart-type-value="barHorizontal"
+     data-stats-chart-data-value="{{ categories_data|json_encode|e('html_attr') }}">
+    <h3>Top genres</h3>
+    <div class="stat-card__chart"><canvas data-stats-chart-target="canvas"></canvas></div>
+</div>

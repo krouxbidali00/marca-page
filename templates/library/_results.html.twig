@@ -1,0 +1,11 @@
+{# XHR fragment: counter + active chips + grid + pagination.
+   Params: page, filter, totalInLibrary (unused here but available) #}
+<div data-library-target="counter" class="text-mute small mb-3">
+    {{ page.total }} livre{{ page.total > 1 ? 's' }} affiché{{ page.total > 1 ? 's' }}{% if not filter.isEmpty %} (filtré){% endif %}
+</div>
+
+{{ include('library/_active_chips.html.twig') }}
+
+{{ include('library/_grid.html.twig') }}
+
+{{ include('_partials/pagination.html.twig', {page: page, route: 'app_library', params: filter.toQueryParams}) }}

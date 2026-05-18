@@ -1,6 +1,17 @@
-// Marca-Page custom styles. Bootstrap is loaded separately (compiled CSS);
-// everything here either overrides Bootstrap CSS variables or adds our own
-// component classes. No styles live in Twig templates.
+// Marca-Page custom styles. Bootstrap is compiled from vendored SCSS sources
+// (twbs/bootstrap) so we can override $grid-breakpoints. The CDN <link> in
+// base.html.twig has been removed. No styles live in Twig templates.
+
+@use '../../vendor/twbs/bootstrap/scss/bootstrap' with (
+  $grid-breakpoints: (
+    xs: 0,
+    sm: 480px,
+    md: 768px,
+    lg: 992px,
+    xl: 1200px,
+    xxl: 1400px,
+  ),
+);
 
 @use 'tokens';
 @use 'typography';
@@ -14,3 +25,5 @@
 @use 'book-detail';
 @use 'landing';
 @use 'auth';
+@use 'library-list';
+@use 'stats';

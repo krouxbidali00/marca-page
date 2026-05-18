@@ -1,0 +1,11 @@
+// When the grid wrapper is in list mode, force a single column.
+// The book-card horizontal layout itself is already defined in _book-card.scss
+// under `.view--list .book-card`.
+.view--list {
+  --bs-columns: 1;
+
+  > .col {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}

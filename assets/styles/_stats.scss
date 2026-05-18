@@ -1,0 +1,65 @@
+.stats-grid {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+
+    > .stat-card--full {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+.stat-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+
+  h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  &__chart {
+    position: relative;
+    height: 240px;
+  }
+}
+
+.stats-period {
+  margin-top: 1rem;
+
+  .pill {
+    transition: all .15s ease;
+
+    &.active {
+      background: var(--bs-primary, #E89BB8);
+      color: #fff;
+      border-color: transparent;
+    }
+  }
+}
+
+.stat-legend {
+  font-size: .9rem;
+
+  li {
+    padding: .25rem 0;
+  }
+
+  &__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex: 0 0 10px;
+  }
+}
+
+.stat-hero-counter {
+  min-width: 100px;
+}

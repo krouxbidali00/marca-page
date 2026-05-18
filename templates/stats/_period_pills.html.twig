@@ -1,0 +1,7 @@
+{# Params: period (StatsPeriod), periods (StatsPeriod[]) #}
+<nav class="stats-period d-flex justify-content-center gap-2 flex-wrap" aria-label="Période">
+    {% for p in periods %}
+        <a class="pill pill-outline {{ p == period ? 'active' }}"
+           href="{{ path('app_stats', p.value == 'all' ? {} : {period: p.value}) }}">{{ p.label }}</a>
+    {% endfor %}
+</nav>

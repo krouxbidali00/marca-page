@@ -1,0 +1,13 @@
+{# Params: stats (StatsResult) #}
+{% set chart_type = stats.period.value == '30d' ? 'bar' : (stats.period.value == 'year' ? 'bar' : 'line') %}
+{% set activity_data = {
+    labels: stats.activitySeries|map(s => s.label),
+    values: stats.activitySeries|map(s => s.count),
+    colors: ['#E89BB8']
+} %}
+<div class="stat-card stat-card--full" data-controller="stats-chart"
+     data-stats-chart-type-value="{{ chart_type }}"
+     data-stats-chart-data-value="{{ activity_data|json_encode|e('html_attr') }}">
+    <h3>Activité — livres ajoutés</h3>
+    <div class="stat-card__chart"><canvas data-stats-chart-target="canvas"></canvas></div>
+</div>
