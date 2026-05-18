@@ -1,0 +1,26 @@
+<form method="post" action="{{ path('app_settings_profile') }}"
+      class="settings-card"
+      data-controller="settings-profile"
+      data-settings-profile-original-email-value="{{ app.user.email }}">
+    <h2>Profil</h2>
+    <input type="hidden" name="_token" value="{{ csrf_token('settings_profile') }}">
+
+    <div class="mb-3">
+        <label class="form-label">Nom d'affichage</label>
+        <input class="form-control" type="text" name="displayName" value="{{ app.user.displayName }}" required maxlength="80">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input class="form-control" type="email" name="email" value="{{ app.user.email }}" required
+               data-settings-profile-target="email"
+               data-action="input->settings-profile#update">
+    </div>
+
+    <div class="mb-3" data-settings-profile-target="passwordRow" hidden>
+        <label class="form-label">Mot de passe actuel <small class="text-mute">(requis pour changer l'email)</small></label>
+        <input class="form-control" type="password" name="currentPassword" autocomplete="current-password">
+    </div>
+
+    <button type="submit" class="btn btn-primary rounded-pill">Enregistrer</button>
+</form>
