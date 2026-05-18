@@ -23,6 +23,7 @@ class BookRepositoryStatsTest extends KernelTestCase
 
         $this->user = (new User())->setEmail('stats@example.test')->setDisplayName('Stats')->setPassword('Secret123');
         $this->em->persist($this->user);
+        $this->em->flush();
     }
 
     private function book(string $title, ReadingStatus $status = ReadingStatus::ToRead, ?int $rating = null, ?int $pages = null, ?string $addedAt = null): Book
@@ -170,5 +171,38 @@ class BookRepositoryStatsTest extends KernelTestCase
 
         $top = $this->books->topCategories($this->user, null, 10);
         self::assertSame(['name' => 'Roman', 'count' => 2], $top[0]);
+    }
+
+    public function testActivitySeriesAllPeriodReturns12MonthlyBuckets(): void
+    {
+        $this->book('Recent', addedAt: 'now');
+        $series = $this->books->activitySeries($this->user, \App\Enum\StatsPeriod::All);
+        self::assertCount(12, $series);
+        self::assertArrayHasKey('label', $series[0]);
+        self::assertArrayHasKey('count', $series[0]);
+        self::assertSame(1, end($series)['count']);
+    }
+
+    public function testActivitySeriesCurrentYearReturns12MonthlyBuckets(): void
+    {
+        $series = $this->books->activitySeries($this->user, \App\Enum\StatsPeriod::CurrentYear);
+        self::assertCount(12, $series);
+        self::assertStringStartsWith((new \DateTimeImmutable())->format('Y') . '-', $series[0]['label']);
+    }
+
+    public function testActivitySeriesLast30DaysReturns30DailyBuckets(): void
+    {
+        $this->book('Today', addedAt: 'now');
+        $series = $this->books->activitySeries($this->user, \App\Enum\StatsPeriod::Last30Days);
+        self::assertCount(30, $series);
+        self::assertSame(1, end($series)['count']);
+    }
+
+    public function testActivitySeriesIgnoresBooksOutsideWindow(): void
+    {
+        $this->book('Old', addedAt: '2020-01-01 12:00:00');
+        $series = $this->books->activitySeries($this->user, \App\Enum\StatsPeriod::Last30Days);
+        $total = array_sum(array_column($series, 'count'));
+        self::assertSame(0, $total);
     }
 }

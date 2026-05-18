@@ -269,4 +269,81 @@ class BookRepository extends ServiceEntityRepository
         }
         return $top;
     }
+
+    /**
+     * Bucketed series adapted to the period grain:
+     *  - All        → 12 monthly buckets, oldest first (current month last)
+     *  - CurrentYear → 12 monthly buckets (Jan → Dec of the current year)
+     *  - Last30Days → 30 daily buckets, today last
+     *
+     * @return list<array{label: string, count: int}>
+     */
+    public function activitySeries(User $owner, \App\Enum\StatsPeriod $period): array
+    {
+        $now = new \DateTimeImmutable('today');
+
+        if ($period === \App\Enum\StatsPeriod::Last30Days) {
+            $start = $now->modify('-29 days');
+            $buckets = [];
+            for ($i = 0; $i < 30; $i++) {
+                $day = $start->modify('+' . $i . ' days');
+                $buckets[$day->format('Y-m-d')] = ['label' => $day->format('m-d'), 'count' => 0];
+            }
+            $rows = $this->createQueryBuilder('b')
+                ->select('b.addedAt AS added')
+                ->andWhere('b.owner = :owner')->setParameter('owner', $owner)
+                ->andWhere('b.addedAt >= :since')->setParameter('since', $start)
+                ->getQuery()->getResult();
+            foreach ($rows as $row) {
+                $key = ($row['added'] instanceof \DateTimeInterface ? $row['added'] : new \DateTimeImmutable((string) $row['added']))->format('Y-m-d');
+                if (isset($buckets[$key])) {
+                    $buckets[$key]['count']++;
+                }
+            }
+            return array_values($buckets);
+        }
+
+        if ($period === \App\Enum\StatsPeriod::CurrentYear) {
+            $year = (int) $now->format('Y');
+            $start = new \DateTimeImmutable($year . '-01-01 00:00:00');
+            $buckets = [];
+            for ($m = 1; $m <= 12; $m++) {
+                $label = sprintf('%04d-%02d', $year, $m);
+                $buckets[$label] = ['label' => $label, 'count' => 0];
+            }
+            $rows = $this->createQueryBuilder('b')
+                ->select('b.addedAt AS added')
+                ->andWhere('b.owner = :owner')->setParameter('owner', $owner)
+                ->andWhere('b.addedAt >= :since')->setParameter('since', $start)
+                ->getQuery()->getResult();
+            foreach ($rows as $row) {
+                $key = ($row['added'] instanceof \DateTimeInterface ? $row['added'] : new \DateTimeImmutable((string) $row['added']))->format('Y-m');
+                if (isset($buckets[$key])) {
+                    $buckets[$key]['count']++;
+                }
+            }
+            return array_values($buckets);
+        }
+
+        // StatsPeriod::All — 12 monthly buckets, ending with the current month.
+        $start = $now->modify('first day of -11 months');
+        $buckets = [];
+        for ($i = 0; $i < 12; $i++) {
+            $month = $start->modify('+' . $i . ' months');
+            $label = $month->format('Y-m');
+            $buckets[$label] = ['label' => $label, 'count' => 0];
+        }
+        $rows = $this->createQueryBuilder('b')
+            ->select('b.addedAt AS added')
+            ->andWhere('b.owner = :owner')->setParameter('owner', $owner)
+            ->andWhere('b.addedAt >= :since')->setParameter('since', $start)
+            ->getQuery()->getResult();
+        foreach ($rows as $row) {
+            $key = ($row['added'] instanceof \DateTimeInterface ? $row['added'] : new \DateTimeImmutable((string) $row['added']))->format('Y-m');
+            if (isset($buckets[$key])) {
+                $buckets[$key]['count']++;
+            }
+        }
+        return array_values($buckets);
+    }
 }
