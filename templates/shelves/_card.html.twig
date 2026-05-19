@@ -1,1 +1,51 @@
-{# Filled in Task 5. #}
+{# Params: overview = {shelf, bookCount, preview, theme} #}
+{% set shelf = overview.shelf %}
+{% set bookCount = overview.bookCount %}
+{% set preview = overview.preview %}
+{% set theme = overview.theme %}
+<div class="col">
+    <article class="shelf-card position-relative">
+        <button type="button"
+                class="shelf-card__kebab"
+                data-bs-toggle="dropdown"
+                aria-label="Actions">
+            <i class="bi bi-three-dots-vertical"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow-sm rounded-4 border-0 p-2">
+            <li>
+                <button type="button" class="dropdown-item rounded-3"
+                        data-action="shelves#openRename"
+                        data-shelves-id-param="{{ shelf.id }}"
+                        data-shelves-name-param="{{ shelf.name }}"
+                        data-shelves-token-param="{{ csrf_token('rename_shelf_' ~ shelf.id) }}">
+                    <i class="bi bi-pencil me-2"></i> Renommer
+                </button>
+            </li>
+            <li>
+                <button type="button" class="dropdown-item rounded-3 text-danger"
+                        data-action="shelves#openDelete"
+                        data-shelves-id-param="{{ shelf.id }}"
+                        data-shelves-name-param="{{ shelf.name }}"
+                        data-shelves-token-param="{{ csrf_token('delete_shelf_' ~ shelf.id) }}">
+                    <i class="bi bi-trash me-2"></i> Supprimer
+                </button>
+            </li>
+        </ul>
+        <a href="{{ path('app_library', {shelf: shelf.id}) }}" class="shelf-card__link stretched-link text-decoration-none">
+            <div class="shelf-card__mosaic">
+                {% for i in 0..3 %}
+                    {% set book = preview[i]|default(null) %}
+                    {% if book %}
+                        {{ include('_partials/book_cover.html.twig', {book: book, size: 'xs', show_text: false}) }}
+                    {% else %}
+                        <div class="cover cover--xs cover--theme-{{ theme }}"><span class="deco"></span></div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div class="shelf-card__body">
+                <div class="shelf-card__name font-serif fw-semibold">{{ shelf.name }}</div>
+                <div class="shelf-card__count text-mute small">{{ bookCount }} livre{{ bookCount > 1 ? 's' }}</div>
+            </div>
+        </a>
+    </article>
+</div>
