@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Étagères · Marca-Page{% endblock %}
+{% block navbar %}{% include '_partials/navbar_app.html.twig' %}{% endblock %}
+{% block footer %}{% include '_partials/footer_compact.html.twig' %}{% endblock %}
+
+{% block body %}
+<div data-controller="shelves">
+    <header class="position-relative overflow-hidden">
+        <div class="blob page-blob--1"></div>
+        <div class="blob page-blob--2"></div>
+        <div class="container py-5 position-relative">
+            <div class="text-center mb-4">
+                <small class="eyebrow">Étagères</small>
+                <h1 class="font-serif display-4 fw-semibold mt-2 mb-3">
+                    {% if totalShelves > 0 %}
+                        {{ totalShelves }} étagère{{ totalShelves > 1 ? 's' }}, <em class="fst-italic text-primary">bien organisée{{ totalShelves > 1 ? 's' }}</em>.
+                    {% else %}
+                        Vos étagères, <em class="fst-italic text-primary">à votre image</em>.
+                    {% endif %}
+                </h1>
+                {% if totalShelves > 0 %}
+                    <button type="button" class="btn btn-primary rounded-pill px-4"
+                            data-bs-toggle="modal" data-bs-target="#shelfCreateModal">
+                        <i class="bi bi-plus-lg me-1"></i> Nouvelle étagère
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <main class="container pb-5">
+        {% if totalShelves == 0 %}
+            {{ include('shelves/_empty.html.twig') }}
+        {% else %}
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 g-md-4">
+                {% for overview in overviews %}
+                    {{ include('shelves/_card.html.twig', {overview: overview}) }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </main>
+
+    {# Modals are always rendered so they exist for the empty state's CTA too. #}
+    {{ include('shelves/_modals.html.twig') }}
+</div>
+{% endblock %}

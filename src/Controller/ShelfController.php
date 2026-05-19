@@ -4,6 +4,9 @@ namespace App\Controller;
 
 use App\Entity\Shelf;
 use App\Entity\User;
+use App\Repository\BookRepository;
+use App\Repository\ShelfRepository;
+use App\Service\CoverThemePicker;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,6 +17,32 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 class ShelfController extends AbstractController
 {
+    #[Route('/shelves', name: 'app_shelf_index', methods: ['GET'])]
+    public function index(
+        ShelfRepository $shelves,
+        BookRepository $books,
+        CoverThemePicker $themePicker,
+    ): Response {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $overviews = [];
+        foreach ($shelves->listOverviewsForUser($user) as $row) {
+            $shelf = $row['shelf'];
+            $overviews[] = [
+                'shelf' => $shelf,
+                'bookCount' => $row['bookCount'],
+                'preview' => $books->findShelfPreview($shelf, 4),
+                'theme' => $themePicker->pick($shelf->getName()),
+            ];
+        }
+
+        return $this->render('shelves/index.html.twig', [
+            'overviews' => $overviews,
+            'totalShelves' => count($overviews),
+        ]);
+    }
+
     #[Route('/shelves', name: 'app_shelf_create', methods: ['POST'])]
     public function create(Request $request, EntityManagerInterface $em): Response
     {
