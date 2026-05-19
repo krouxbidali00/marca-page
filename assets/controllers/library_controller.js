@@ -122,7 +122,7 @@ export default class extends Controller {
     }
 
     applyUrl(href) {
-        // href is like "/library?reading%5B%5D=reading&page=2"
+        // href is like "/bibliotheque?reading%5B%5D=reading&page=2"
         const url = new URL(href, window.location.origin);
         this.syncFormsFromParams(url.searchParams);
         this.searchTarget.value = url.searchParams.get('q') || '';

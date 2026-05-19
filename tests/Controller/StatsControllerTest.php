@@ -11,8 +11,8 @@ class StatsControllerTest extends WebTestCase
     public function testStatsRedirectsAnonymousToLogin(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/stats');
-        self::assertResponseRedirects('/login');
+        $client->request('GET', '/statistiques');
+        self::assertResponseRedirects('/connexion');
     }
 
     public function testStatsRendersForLoggedInUser(): void
@@ -24,7 +24,7 @@ class StatsControllerTest extends WebTestCase
         $em->flush();
         $client->loginUser($user);
 
-        $crawler = $client->request('GET', '/stats');
+        $crawler = $client->request('GET', '/statistiques');
         self::assertResponseIsSuccessful();
         self::assertStringContainsString('en chiffres', (string) $client->getResponse()->getContent());
         self::assertGreaterThanOrEqual(5, $crawler->filter('canvas[data-stats-chart-target="canvas"]')->count());
@@ -39,7 +39,7 @@ class StatsControllerTest extends WebTestCase
         $em->flush();
         $client->loginUser($user);
 
-        $crawler = $client->request('GET', '/stats?period=year');
+        $crawler = $client->request('GET', '/statistiques?period=year');
         self::assertResponseIsSuccessful();
         $active = $crawler->filter('.stats-period a.active')->text();
         self::assertSame('Cette année', trim($active));

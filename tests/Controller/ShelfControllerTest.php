@@ -11,8 +11,8 @@ class ShelfControllerTest extends WebTestCase
     public function testIndexRedirectsAnonymousToLogin(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/shelves');
-        self::assertResponseRedirects('/login');
+        $client->request('GET', '/etageres');
+        self::assertResponseRedirects('/connexion');
     }
 
     public function testIndexEmptyShowsEmptyState(): void
@@ -24,7 +24,7 @@ class ShelfControllerTest extends WebTestCase
         $em->flush();
         $client->loginUser($user);
 
-        $client->request('GET', '/shelves');
+        $client->request('GET', '/etageres');
         self::assertResponseIsSuccessful();
         self::assertStringContainsString('Aucune étagère', (string) $client->getResponse()->getContent());
     }
@@ -47,7 +47,7 @@ class ShelfControllerTest extends WebTestCase
         $em->flush();
 
         $client->loginUser($user);
-        $crawler = $client->request('GET', '/shelves');
+        $crawler = $client->request('GET', '/etageres');
         self::assertResponseIsSuccessful();
 
         $names = $crawler->filter('.shelf-card__name')->each(fn ($n) => trim($n->text()));
@@ -68,9 +68,9 @@ class ShelfControllerTest extends WebTestCase
         $em->flush();
 
         $client->loginUser($user);
-        $crawler = $client->request('GET', '/shelves');
+        $crawler = $client->request('GET', '/etageres');
         $href = $crawler->filter('.shelf-card__link')->attr('href');
-        self::assertSame('/library?shelf=' . $shelf->getId(), $href);
+        self::assertSame('/bibliotheque?shelf=' . $shelf->getId(), $href);
     }
 
     public function testIndexRendersAllThreeModals(): void
@@ -82,7 +82,7 @@ class ShelfControllerTest extends WebTestCase
         $em->flush();
         $client->loginUser($user);
 
-        $crawler = $client->request('GET', '/shelves');
+        $crawler = $client->request('GET', '/etageres');
         self::assertResponseIsSuccessful();
         self::assertCount(1, $crawler->filter('#shelfCreateModal'));
         self::assertCount(1, $crawler->filter('#shelfRenameModal'));
@@ -99,12 +99,12 @@ class ShelfControllerTest extends WebTestCase
         $em->persist($shelf);
         $em->flush();
         $client->loginUser($user);
-        $crawler = $client->request('GET', '/shelves');
+        $crawler = $client->request('GET', '/etageres');
 
         $csrf = $crawler->filter('[data-action="shelves#openRename"]')->attr('data-shelves-token-param');
         $client->request('POST', '/shelves/' . $shelf->getId() . '/rename', ['_token' => $csrf, 'name' => 'New name']);
 
-        self::assertResponseRedirects('/shelves');
+        self::assertResponseRedirects('/etageres');
         $em->clear();
         $reloaded = $em->getRepository(\App\Entity\Shelf::class)->find($shelf->getId());
         self::assertSame('New name', $reloaded->getName());
@@ -155,12 +155,12 @@ class ShelfControllerTest extends WebTestCase
         $em->persist($shelf);
         $em->flush();
         $client->loginUser($user);
-        $crawler = $client->request('GET', '/shelves');
+        $crawler = $client->request('GET', '/etageres');
 
         $csrf = $crawler->filter('[data-action="shelves#openRename"]')->attr('data-shelves-token-param');
         $client->request('POST', '/shelves/' . $shelf->getId() . '/rename', ['_token' => $csrf, 'name' => '   ']);
 
-        self::assertResponseRedirects('/shelves');
+        self::assertResponseRedirects('/etageres');
         $em->clear();
         $reloaded = $em->getRepository(\App\Entity\Shelf::class)->find($shelf->getId());
         self::assertSame('Keep me', $reloaded->getName());
@@ -181,12 +181,12 @@ class ShelfControllerTest extends WebTestCase
         $shelfId = $shelf->getId();
 
         $client->loginUser($user);
-        $crawler = $client->request('GET', '/shelves');
+        $crawler = $client->request('GET', '/etageres');
 
         $token = $crawler->filter('[data-action="shelves#openDelete"]')->attr('data-shelves-token-param');
         $client->request('POST', '/shelves/' . $shelfId . '/delete', ['_token' => $token]);
 
-        self::assertResponseRedirects('/shelves');
+        self::assertResponseRedirects('/etageres');
         $em->clear();
         self::assertNull($em->getRepository(\App\Entity\Shelf::class)->find($shelfId));
         $reloadedBook = $em->getRepository(\App\Entity\Book::class)->find($bookId);
@@ -238,7 +238,7 @@ class ShelfControllerTest extends WebTestCase
         $em->flush();
         $client->loginUser($user);
 
-        $crawler = $client->request('GET', '/shelves');
+        $crawler = $client->request('GET', '/etageres');
         $active = $crawler->filter('.navbar-nav .nav-link.active')->text();
         self::assertSame('Étagères', trim($active));
     }
@@ -252,15 +252,15 @@ class ShelfControllerTest extends WebTestCase
         $em->flush();
         $client->loginUser($user);
 
-        $crawler = $client->request('GET', '/shelves');
+        $crawler = $client->request('GET', '/etageres');
         $csrf = $crawler->filter('#shelfCreateModal input[name="_token"]')->attr('value');
         $client->request('POST', '/shelves', [
             '_token' => $csrf,
-            '_back' => '/shelves',
+            '_back' => '/etageres',
             'name' => 'New from page',
         ]);
 
-        self::assertResponseRedirects('/shelves');
+        self::assertResponseRedirects('/etageres');
         $em->clear();
         $shelves = $em->getRepository(\App\Entity\Shelf::class)->findBy(['name' => 'New from page']);
         self::assertCount(1, $shelves);

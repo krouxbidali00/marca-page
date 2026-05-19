@@ -17,7 +17,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 class SettingsController extends AbstractController
 {
-    #[Route('/settings', name: 'app_settings', methods: ['GET'])]
+    #[Route('/parametres', name: 'app_settings', methods: ['GET'])]
     public function index(): Response
     {
         return $this->render('settings/index.html.twig');
@@ -138,7 +138,7 @@ class SettingsController extends AbstractController
         return $this->redirectToRoute('app_home');
     }
 
-    #[Route('/settings/export', name: 'app_settings_export', methods: ['GET'])]
+    #[Route('/parametres/export', name: 'app_settings_export', methods: ['GET'])]
     public function export(LibraryExporter $exporter): Response
     {
         /** @var User $user */

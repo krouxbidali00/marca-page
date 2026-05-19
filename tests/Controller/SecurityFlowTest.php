@@ -16,14 +16,14 @@ class SecurityFlowTest extends WebTestCase
         $em->persist((new User())->setEmail('bob@example.test')->setDisplayName('Bob')->setPassword('Secret123'));
         $em->flush();
 
-        $crawler = $client->request('GET', '/login');
+        $crawler = $client->request('GET', '/connexion');
         $form = $crawler->selectButton('Ouvrir ma bibliothèque')->form([
             '_username' => 'bob@example.test',
             '_password' => 'Secret123',
         ]);
         $client->submit($form);
 
-        self::assertResponseRedirects('/library');
+        self::assertResponseRedirects('/bibliotheque');
         $client->followRedirect();
         self::assertResponseIsSuccessful();
     }
@@ -35,7 +35,7 @@ class SecurityFlowTest extends WebTestCase
         $em->persist((new User())->setEmail('eve@example.test')->setDisplayName('Eve')->setPassword('Secret123'));
         $em->flush();
 
-        $crawler = $client->request('GET', '/login');
+        $crawler = $client->request('GET', '/connexion');
         $form = $crawler->selectButton('Ouvrir ma bibliothèque')->form([
             '_username' => 'eve@example.test',
             '_password' => 'wrong',

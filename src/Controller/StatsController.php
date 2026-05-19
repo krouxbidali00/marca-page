@@ -14,7 +14,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 class StatsController extends AbstractController
 {
-    #[Route('/stats', name: 'app_stats', methods: ['GET'])]
+    #[Route('/statistiques', name: 'app_stats', methods: ['GET'])]
     public function index(Request $request, StatsAggregator $aggregator): Response
     {
         /** @var User $user */

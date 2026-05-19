@@ -9,16 +9,16 @@ class LibraryAccessTest extends WebTestCase
     public function testLibraryRedirectsAnonymousToLogin(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/library');
+        $client->request('GET', '/bibliotheque');
 
-        self::assertResponseRedirects('/login');
+        self::assertResponseRedirects('/connexion');
     }
 
     public function testBookSearchRedirectsAnonymousToLogin(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/books/search');
+        $client->request('GET', '/livres/recherche');
 
-        self::assertResponseRedirects('/login');
+        self::assertResponseRedirects('/connexion');
     }
 }

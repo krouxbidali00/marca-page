@@ -18,7 +18,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 class ShelfController extends AbstractController
 {
-    #[Route('/shelves', name: 'app_shelf_index', methods: ['GET'])]
+    #[Route('/etageres', name: 'app_shelf_index', methods: ['GET'])]
     public function index(
         ShelfRepository $shelves,
         BookRepository $books,

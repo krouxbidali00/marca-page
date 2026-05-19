@@ -19,7 +19,7 @@ class BookImportTest extends WebTestCase
         $client->loginUser($user);
 
         // Search page renders results (the fake Google client returns one volume) and exposes a CSRF token.
-        $crawler = $client->request('GET', '/books/search?q=camus');
+        $crawler = $client->request('GET', '/livres/recherche?q=camus');
         self::assertResponseIsSuccessful();
         $token = $crawler->filter('input[name="_token"]')->first()->attr('value');
 
@@ -31,13 +31,13 @@ class BookImportTest extends WebTestCase
         self::assertSame("L'Étranger", $books[0]->getTitle());
 
         // Importing the same volume again does not create a duplicate.
-        $crawler = $client->request('GET', '/books/search?q=camus');
+        $crawler = $client->request('GET', '/livres/recherche?q=camus');
         $token = $crawler->filter('input[name="_token"]')->first()->attr('value');
         $client->request('POST', '/books/import', ['volumeId' => 'test-vol-1', '_token' => $token]);
         self::assertCount(1, static::getContainer()->get(BookRepository::class)->findBy(['owner' => $user]));
 
         // The book shows up on the library page.
-        $client->request('GET', '/library');
+        $client->request('GET', '/bibliotheque');
         self::assertResponseIsSuccessful();
         self::assertStringContainsString('Étranger', (string) $client->getResponse()->getContent());
     }
