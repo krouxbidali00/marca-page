@@ -242,4 +242,27 @@ class ShelfControllerTest extends WebTestCase
         $active = $crawler->filter('.navbar-nav .nav-link.active')->text();
         self::assertSame('Étagères', trim($active));
     }
+
+    public function testCreateFromShelvesPageRedirectsBackToShelves(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get(\Doctrine\ORM\EntityManagerInterface::class);
+        $user = (new User())->setEmail('createback@example.test')->setDisplayName('CB')->setPassword('Secret123');
+        $em->persist($user);
+        $em->flush();
+        $client->loginUser($user);
+
+        $crawler = $client->request('GET', '/shelves');
+        $csrf = $crawler->filter('#shelfCreateModal input[name="_token"]')->attr('value');
+        $client->request('POST', '/shelves', [
+            '_token' => $csrf,
+            '_back' => '/shelves',
+            'name' => 'New from page',
+        ]);
+
+        self::assertResponseRedirects('/shelves');
+        $em->clear();
+        $shelves = $em->getRepository(\App\Entity\Shelf::class)->findBy(['name' => 'New from page']);
+        self::assertCount(1, $shelves);
+    }
 }
