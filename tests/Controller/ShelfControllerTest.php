@@ -88,4 +88,81 @@ class ShelfControllerTest extends WebTestCase
         self::assertCount(1, $crawler->filter('#shelfRenameModal'));
         self::assertCount(1, $crawler->filter('#shelfDeleteModal'));
     }
+
+    public function testRenamePersistsNewName(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get(\Doctrine\ORM\EntityManagerInterface::class);
+        $user = (new User())->setEmail('rename@example.test')->setDisplayName('R')->setPassword('Secret123');
+        $em->persist($user);
+        $shelf = (new \App\Entity\Shelf())->setOwner($user)->setName('Old name');
+        $em->persist($shelf);
+        $em->flush();
+        $client->loginUser($user);
+        $crawler = $client->request('GET', '/shelves');
+
+        $csrf = $crawler->filter('[data-action="shelves#openRename"]')->attr('data-shelves-token-param');
+        $client->request('POST', '/shelves/' . $shelf->getId() . '/rename', ['_token' => $csrf, 'name' => 'New name']);
+
+        self::assertResponseRedirects('/shelves');
+        $em->clear();
+        $reloaded = $em->getRepository(\App\Entity\Shelf::class)->find($shelf->getId());
+        self::assertSame('New name', $reloaded->getName());
+    }
+
+    public function testRenameForbiddenForOtherUser(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get(\Doctrine\ORM\EntityManagerInterface::class);
+        $alice = (new User())->setEmail('alice-r@example.test')->setDisplayName('A')->setPassword('Secret123');
+        $bob = (new User())->setEmail('bob-r@example.test')->setDisplayName('B')->setPassword('Secret123');
+        $em->persist($alice);
+        $em->persist($bob);
+        $shelf = (new \App\Entity\Shelf())->setOwner($alice)->setName('Alice shelf');
+        $em->persist($shelf);
+        $em->flush();
+        $client->loginUser($bob);
+
+        // Voter is checked before CSRF, so an invalid token is fine here — the access denial is what we verify.
+        $client->request('POST', '/shelves/' . $shelf->getId() . '/rename', ['_token' => 'anything', 'name' => 'Hacked']);
+
+        self::assertSame(403, $client->getResponse()->getStatusCode());
+    }
+
+    public function testRenameForbiddenWithBadCsrf(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get(\Doctrine\ORM\EntityManagerInterface::class);
+        $user = (new User())->setEmail('renamecsrf@example.test')->setDisplayName('RC')->setPassword('Secret123');
+        $em->persist($user);
+        $shelf = (new \App\Entity\Shelf())->setOwner($user)->setName('Shelf');
+        $em->persist($shelf);
+        $em->flush();
+        $client->loginUser($user);
+
+        $client->request('POST', '/shelves/' . $shelf->getId() . '/rename', ['_token' => 'wrong', 'name' => 'X']);
+
+        self::assertSame(403, $client->getResponse()->getStatusCode());
+    }
+
+    public function testRenameEmptyNameDoesNotPersist(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get(\Doctrine\ORM\EntityManagerInterface::class);
+        $user = (new User())->setEmail('renameempty@example.test')->setDisplayName('RE')->setPassword('Secret123');
+        $em->persist($user);
+        $shelf = (new \App\Entity\Shelf())->setOwner($user)->setName('Keep me');
+        $em->persist($shelf);
+        $em->flush();
+        $client->loginUser($user);
+        $crawler = $client->request('GET', '/shelves');
+
+        $csrf = $crawler->filter('[data-action="shelves#openRename"]')->attr('data-shelves-token-param');
+        $client->request('POST', '/shelves/' . $shelf->getId() . '/rename', ['_token' => $csrf, 'name' => '   ']);
+
+        self::assertResponseRedirects('/shelves');
+        $em->clear();
+        $reloaded = $em->getRepository(\App\Entity\Shelf::class)->find($shelf->getId());
+        self::assertSame('Keep me', $reloaded->getName());
+    }
 }

@@ -6,6 +6,7 @@ use App\Entity\Shelf;
 use App\Entity\User;
 use App\Repository\BookRepository;
 use App\Repository\ShelfRepository;
+use App\Security\ShelfVoter;
 use App\Service\CoverThemePicker;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -62,5 +63,28 @@ class ShelfController extends AbstractController
         $back = (string) $request->request->get('_back', '');
 
         return $this->redirect($back !== '' && str_starts_with($back, '/') ? $back : $this->generateUrl('app_library'));
+    }
+
+    #[Route('/shelves/{id}/rename', name: 'app_shelf_rename', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function rename(Shelf $shelf, Request $request, EntityManagerInterface $em): Response
+    {
+        $this->denyAccessUnlessGranted(ShelfVoter::OWN, $shelf);
+
+        if (!$this->isCsrfTokenValid('rename_shelf_' . $shelf->getId(), (string) $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
+        $name = trim((string) $request->request->get('name', ''));
+        if ($name === '') {
+            $this->addFlash('error', 'Le nom de l\'étagère ne peut pas être vide.');
+
+            return $this->redirectToRoute('app_shelf_index');
+        }
+
+        $shelf->setName(mb_substr($name, 0, 80));
+        $em->flush();
+        $this->addFlash('success', \sprintf('Étagère renommée en « %s ».', $shelf->getName()));
+
+        return $this->redirectToRoute('app_shelf_index');
     }
 }
