@@ -149,6 +149,7 @@ class BookRepository extends ServiceEntityRepository
             ->setParameter('shelf', $shelf)
             ->orderBy('CASE WHEN b.thumbnailUrl IS NULL THEN 1 ELSE 0 END', 'ASC')
             ->addOrderBy('b.addedAt', 'DESC')
+            ->addOrderBy('b.id', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
