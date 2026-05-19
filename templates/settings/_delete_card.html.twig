@@ -1,0 +1,15 @@
+<form method="post" action="{{ path('app_settings_delete') }}"
+      class="settings-card settings-card--danger"
+      data-controller="settings-delete"
+      data-action="submit->settings-delete#confirm">
+    <h2>Zone dangereuse</h2>
+    <p class="text-mute">La suppression de votre compte est <strong>définitive</strong>. Tous vos livres, citations et étagères seront perdus.</p>
+    <input type="hidden" name="_token" value="{{ csrf_token('settings_delete') }}">
+
+    <div class="mb-3">
+        <label class="form-label">Mot de passe actuel</label>
+        <input class="form-control" type="password" name="currentPassword" required autocomplete="current-password">
+    </div>
+
+    <button type="submit" class="btn btn-danger rounded-pill">Supprimer mon compte</button>
+</form>

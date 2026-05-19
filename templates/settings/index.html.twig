@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paramètres · Marca-Page{% endblock %}
+{% block navbar %}{% include '_partials/navbar_app.html.twig' %}{% endblock %}
+{% block footer %}{% include '_partials/footer_compact.html.twig' %}{% endblock %}
+
+{% block body %}
+<header class="position-relative overflow-hidden">
+    <div class="blob page-blob--1"></div>
+    <div class="blob page-blob--2"></div>
+    <div class="container py-5 position-relative">
+        <div class="text-center mb-4">
+            <small class="eyebrow">Compte</small>
+            <h1 class="font-serif display-4 fw-semibold mt-2 mb-3">Paramètres</h1>
+            <p class="text-mute fs-5">Gérez votre profil, votre mot de passe et vos données.</p>
+        </div>
+    </div>
+</header>
+
+<main class="container pb-5">
+    <div class="settings-stack">
+        {{ include('_partials/flash_messages.html.twig') }}
+        {{ include('settings/_profile_card.html.twig') }}
+        {{ include('settings/_password_card.html.twig') }}
+        {{ include('settings/_export_card.html.twig') }}
+        {{ include('settings/_delete_card.html.twig') }}
+    </div>
+</main>
+{% endblock %}
