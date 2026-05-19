@@ -1,0 +1,74 @@
+@use 'tokens';
+
+.shelf-card {
+    background: var(--surface, #fff);
+    border-radius: 1rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+    overflow: hidden;
+    transition: transform .2s ease, box-shadow .2s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, .08);
+    }
+}
+
+.shelf-card__menu {
+    position: absolute;
+    top: .5rem;
+    right: .5rem;
+    z-index: 2;
+}
+
+.shelf-card__kebab {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .85);
+    border: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink, #3A2A33);
+    backdrop-filter: blur(4px);
+
+    &:hover { background: #fff; }
+}
+
+.shelf-card__link {
+    display: block;
+    color: inherit;
+}
+
+.shelf-card__mosaic {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    aspect-ratio: 1 / 1;
+    background: rgba(0, 0, 0, .04);
+
+    > .cover {
+        width: 100%;
+        height: 100%;
+        aspect-ratio: auto;
+        border-radius: 0;
+    }
+}
+
+.shelf-card__body {
+    padding: .75rem 1rem 1rem;
+}
+
+.shelf-card__name {
+    font-size: 1rem;
+    line-height: 1.2;
+}
+
+.shelf-card__count {
+    margin-top: .15rem;
+}
+
+/* Empty state card (replaces inline style="max-width: 32rem;" in _empty.html.twig) */
+.shelves-empty {
+    max-width: 32rem;
+}
