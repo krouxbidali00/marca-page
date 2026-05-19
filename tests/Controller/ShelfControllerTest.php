@@ -228,4 +228,18 @@ class ShelfControllerTest extends WebTestCase
 
         self::assertSame(403, $client->getResponse()->getStatusCode());
     }
+
+    public function testNavbarLinkIsActiveOnShelvesPage(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get(\Doctrine\ORM\EntityManagerInterface::class);
+        $user = (new User())->setEmail('nav-shelves@example.test')->setDisplayName('NS')->setPassword('Secret123');
+        $em->persist($user);
+        $em->flush();
+        $client->loginUser($user);
+
+        $crawler = $client->request('GET', '/shelves');
+        $active = $crawler->filter('.navbar-nav .nav-link.active')->text();
+        self::assertSame('Étagères', trim($active));
+    }
 }
