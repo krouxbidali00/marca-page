@@ -55,9 +55,10 @@ class ShelfController extends AbstractController
         $user = $this->getUser();
         $name = trim((string) $request->request->get('name', ''));
         if ($name !== '') {
-            $em->persist((new Shelf())->setOwner($user)->setName(mb_substr($name, 0, 80)));
+            $shelf = (new Shelf())->setOwner($user)->setName(mb_substr($name, 0, 80));
+            $em->persist($shelf);
             $em->flush();
-            $this->addFlash('success', \sprintf('Étagère « %s » créée.', $name));
+            $this->addFlash('success', \sprintf('Étagère « %s » créée.', $shelf->getName()));
         }
 
         $back = (string) $request->request->get('_back', '');
