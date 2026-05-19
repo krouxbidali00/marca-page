@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Dto\LibraryFilter;
 use App\Entity\Book;
+use App\Entity\Shelf;
 use App\Entity\User;
 use App\Pagination\Page;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -136,6 +137,22 @@ class BookRepository extends ServiceEntityRepository
         }
 
         return \array_slice(array_values($byId), 0, $limit);
+    }
+
+    /**
+     * @return list<Book>
+     */
+    public function findShelfPreview(Shelf $shelf, int $limit = 4): array
+    {
+        return $this->createQueryBuilder('b')
+            ->where('b.shelf = :shelf')
+            ->setParameter('shelf', $shelf)
+            ->orderBy('CASE WHEN b.thumbnailUrl IS NULL THEN 1 ELSE 0 END', 'ASC')
+            ->addOrderBy('b.addedAt', 'DESC')
+            ->addOrderBy('b.id', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
     }
 
     public function sumPages(User $owner): int

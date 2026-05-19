@@ -2,29 +2,30 @@
 // (twbs/bootstrap) so we can override $grid-breakpoints. The CDN <link> in
 // base.html.twig has been removed. No styles live in Twig templates.
 
-@use '../../vendor/twbs/bootstrap/scss/bootstrap' with (
-  $grid-breakpoints: (
-    xs: 0,
-    sm: 480px,
-    md: 768px,
-    lg: 992px,
-    xl: 1200px,
-    xxl: 1400px,
-  ),
+@use "../../vendor/twbs/bootstrap/scss/bootstrap" with (
+    $grid-breakpoints: (
+        xs: 0,
+        sm: 480px,
+        md: 768px,
+        lg: 992px,
+        xl: 1200px,
+        xxl: 1400px,
+    )
 );
 
-@use 'tokens';
-@use 'typography';
-@use 'buttons';
-@use 'navbar';
-@use 'book-cover';
-@use 'book-card';
-@use 'pills';
-@use 'components';
-@use 'filters';
-@use 'book-detail';
-@use 'landing';
-@use 'auth';
-@use 'library-list';
-@use 'stats';
-@use 'settings';
+@use "tokens";
+@use "typography";
+@use "buttons";
+@use "navbar";
+@use "book-cover";
+@use "book-card";
+@use "pills";
+@use "components";
+@use "filters";
+@use "book-detail";
+@use "landing";
+@use "auth";
+@use "library-list";
+@use "stats";
+@use "settings";
+@use "shelves";

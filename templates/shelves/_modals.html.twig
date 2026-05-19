@@ -1,0 +1,69 @@
+{# Three global modals for the /shelves page.
+   - shelfCreateModal: classic POST form, fixed CSRF token.
+   - shelfRenameModal & shelfDeleteModal: action URL, CSRF token and shelf name
+     are injected at open time by the `shelves` Stimulus controller. #}
+
+<div class="modal fade" id="shelfCreateModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="post" action="{{ path('app_shelf_create') }}" class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-0">
+                <h5 class="modal-title font-serif fw-semibold">Nouvelle étagère</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="_token" value="{{ csrf_token('create_shelf') }}">
+                <input type="hidden" name="_back" value="{{ path('app_shelf_index') }}">
+                <label for="shelfCreateName" class="form-label">Nom</label>
+                <input type="text" id="shelfCreateName" name="name" class="form-control rounded-pill" maxlength="80" required autocomplete="off">
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-soft rounded-pill" data-bs-dismiss="modal">Annuler</button>
+                <button type="submit" class="btn btn-primary rounded-pill">Créer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="shelfRenameModal" tabindex="-1" aria-hidden="true"
+     data-shelves-target="renameModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="post" action="" class="modal-content rounded-4 border-0 shadow"
+              data-shelves-target="renameForm">
+            <div class="modal-header border-0">
+                <h5 class="modal-title font-serif fw-semibold">Renommer « <span data-shelves-target="renameLabel"></span> »</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="_token" value="" data-shelves-target="renameToken">
+                <label for="shelfRenameName" class="form-label">Nouveau nom</label>
+                <input type="text" id="shelfRenameName" name="name" class="form-control rounded-pill" maxlength="80" required autocomplete="off"
+                       data-shelves-target="renameInput">
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-soft rounded-pill" data-bs-dismiss="modal">Annuler</button>
+                <button type="submit" class="btn btn-primary rounded-pill">Renommer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="shelfDeleteModal" tabindex="-1" aria-hidden="true"
+     data-shelves-target="deleteModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="post" action="" class="modal-content rounded-4 border-0 shadow"
+              data-shelves-target="deleteForm">
+            <div class="modal-header border-0">
+                <h5 class="modal-title font-serif fw-semibold">Supprimer l'étagère</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="_token" value="" data-shelves-target="deleteToken">
+                <p class="mb-0">Supprimer l'étagère « <strong data-shelves-target="deleteLabel"></strong> » ? Les livres ne seront pas supprimés, ils ne seront simplement plus rangés dans cette étagère.</p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-soft rounded-pill" data-bs-dismiss="modal">Annuler</button>
+                <button type="submit" class="btn btn-danger rounded-pill">Supprimer</button>
+            </div>
+        </form>
+    </div>
+</div>
