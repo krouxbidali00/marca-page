@@ -72,4 +72,20 @@ class ShelfControllerTest extends WebTestCase
         $href = $crawler->filter('.shelf-card__link')->attr('href');
         self::assertSame('/library?shelf=' . $shelf->getId(), $href);
     }
+
+    public function testIndexRendersAllThreeModals(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get(\Doctrine\ORM\EntityManagerInterface::class);
+        $user = (new User())->setEmail('shelves-modals@example.test')->setDisplayName('SM')->setPassword('Secret123');
+        $em->persist($user);
+        $em->flush();
+        $client->loginUser($user);
+
+        $crawler = $client->request('GET', '/shelves');
+        self::assertResponseIsSuccessful();
+        self::assertCount(1, $crawler->filter('#shelfCreateModal'));
+        self::assertCount(1, $crawler->filter('#shelfRenameModal'));
+        self::assertCount(1, $crawler->filter('#shelfDeleteModal'));
+    }
 }
