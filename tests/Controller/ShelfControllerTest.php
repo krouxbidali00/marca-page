@@ -165,4 +165,67 @@ class ShelfControllerTest extends WebTestCase
         $reloaded = $em->getRepository(\App\Entity\Shelf::class)->find($shelf->getId());
         self::assertSame('Keep me', $reloaded->getName());
     }
+
+    public function testDeleteRemovesShelfAndNullifiesBookShelf(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get(\Doctrine\ORM\EntityManagerInterface::class);
+        $user = (new User())->setEmail('delete@example.test')->setDisplayName('D')->setPassword('Secret123');
+        $em->persist($user);
+        $shelf = (new \App\Entity\Shelf())->setOwner($user)->setName('Doomed');
+        $em->persist($shelf);
+        $book = (new \App\Entity\Book())->setOwner($user)->setGoogleVolumeId('dv1')->setTitle('Survivor')->setShelf($shelf);
+        $em->persist($book);
+        $em->flush();
+        $bookId = $book->getId();
+        $shelfId = $shelf->getId();
+
+        $client->loginUser($user);
+        $crawler = $client->request('GET', '/shelves');
+
+        $token = $crawler->filter('[data-action="shelves#openDelete"]')->attr('data-shelves-token-param');
+        $client->request('POST', '/shelves/' . $shelfId . '/delete', ['_token' => $token]);
+
+        self::assertResponseRedirects('/shelves');
+        $em->clear();
+        self::assertNull($em->getRepository(\App\Entity\Shelf::class)->find($shelfId));
+        $reloadedBook = $em->getRepository(\App\Entity\Book::class)->find($bookId);
+        self::assertNotNull($reloadedBook);
+        self::assertNull($reloadedBook->getShelf());
+    }
+
+    public function testDeleteForbiddenForOtherUser(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get(\Doctrine\ORM\EntityManagerInterface::class);
+        $alice = (new User())->setEmail('alice-d@example.test')->setDisplayName('A')->setPassword('Secret123');
+        $bob = (new User())->setEmail('bob-d@example.test')->setDisplayName('B')->setPassword('Secret123');
+        $em->persist($alice);
+        $em->persist($bob);
+        $shelf = (new \App\Entity\Shelf())->setOwner($alice)->setName('Alice shelf');
+        $em->persist($shelf);
+        $em->flush();
+        $client->loginUser($bob);
+
+        // Voter is checked before CSRF, so an invalid token is fine here — the access denial is what we verify.
+        $client->request('POST', '/shelves/' . $shelf->getId() . '/delete', ['_token' => 'anything']);
+
+        self::assertSame(403, $client->getResponse()->getStatusCode());
+    }
+
+    public function testDeleteForbiddenWithBadCsrf(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get(\Doctrine\ORM\EntityManagerInterface::class);
+        $user = (new User())->setEmail('deletecsrf@example.test')->setDisplayName('DC')->setPassword('Secret123');
+        $em->persist($user);
+        $shelf = (new \App\Entity\Shelf())->setOwner($user)->setName('Shelf');
+        $em->persist($shelf);
+        $em->flush();
+        $client->loginUser($user);
+
+        $client->request('POST', '/shelves/' . $shelf->getId() . '/delete', ['_token' => 'wrong']);
+
+        self::assertSame(403, $client->getResponse()->getStatusCode());
+    }
 }

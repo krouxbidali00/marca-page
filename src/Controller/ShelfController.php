@@ -87,4 +87,21 @@ class ShelfController extends AbstractController
 
         return $this->redirectToRoute('app_shelf_index');
     }
+
+    #[Route('/shelves/{id}/delete', name: 'app_shelf_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function delete(Shelf $shelf, Request $request, EntityManagerInterface $em): Response
+    {
+        $this->denyAccessUnlessGranted(ShelfVoter::OWN, $shelf);
+
+        if (!$this->isCsrfTokenValid('delete_shelf_' . $shelf->getId(), (string) $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
+        $name = $shelf->getName();
+        $em->remove($shelf);
+        $em->flush();
+        $this->addFlash('success', \sprintf('Étagère « %s » supprimée.', $name));
+
+        return $this->redirectToRoute('app_shelf_index');
+    }
 }
