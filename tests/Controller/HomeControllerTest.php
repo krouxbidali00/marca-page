@@ -18,7 +18,7 @@ class HomeControllerTest extends WebTestCase
     public function testLoginPageRenders(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/login');
+        $client->request('GET', '/connexion');
 
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('input[name="_username"]');
@@ -28,7 +28,7 @@ class HomeControllerTest extends WebTestCase
     public function testRegisterPageRenders(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/register');
+        $client->request('GET', '/inscription');
 
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('input[name="registration_form[email]"]');

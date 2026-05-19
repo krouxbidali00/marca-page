@@ -12,8 +12,8 @@ class SettingsControllerTest extends WebTestCase
     public function testSettingsRedirectsAnonymousToLogin(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/settings');
-        self::assertResponseRedirects('/login');
+        $client->request('GET', '/parametres');
+        self::assertResponseRedirects('/connexion');
     }
 
     public function testSettingsRendersForLoggedInUser(): void
@@ -25,7 +25,7 @@ class SettingsControllerTest extends WebTestCase
         $em->flush();
         $client->loginUser($user);
 
-        $client->request('GET', '/settings');
+        $client->request('GET', '/parametres');
         self::assertResponseIsSuccessful();
         self::assertStringContainsString('Paramètres', (string) $client->getResponse()->getContent());
     }
@@ -34,7 +34,7 @@ class SettingsControllerTest extends WebTestCase
     {
         // Template doesn't expose a form for this token yet (added in a later task).
         // Seed the CSRF token directly into the session the test client is using.
-        $client->request('GET', '/settings');
+        $client->request('GET', '/parametres');
         $session = $client->getRequest()->getSession();
         $token = bin2hex(random_bytes(16));
         $session->set('_csrf/' . $tokenId, $token);
@@ -59,7 +59,7 @@ class SettingsControllerTest extends WebTestCase
             'email' => 'p1@example.test',
             'currentPassword' => '',
         ]);
-        self::assertResponseRedirects('/settings');
+        self::assertResponseRedirects('/parametres');
 
         $em->clear();
         $reloaded = $em->getRepository(User::class)->findOneBy(['email' => 'p1@example.test']);
@@ -83,7 +83,7 @@ class SettingsControllerTest extends WebTestCase
             'email' => 'p2-new@example.test',
             'currentPassword' => '',
         ]);
-        self::assertResponseRedirects('/settings');
+        self::assertResponseRedirects('/parametres');
 
         $em->clear();
         $stillOld = $em->getRepository(User::class)->findOneBy(['email' => 'p2@example.test']);
@@ -107,7 +107,7 @@ class SettingsControllerTest extends WebTestCase
             'email' => 'p3-new@example.test',
             'currentPassword' => 'WrongPass',
         ]);
-        self::assertResponseRedirects('/settings');
+        self::assertResponseRedirects('/parametres');
 
         $em->clear();
         $stillOld = $em->getRepository(User::class)->findOneBy(['email' => 'p3@example.test']);
@@ -131,7 +131,7 @@ class SettingsControllerTest extends WebTestCase
             'email' => 'p4-new@example.test',
             'currentPassword' => 'Secret123',
         ]);
-        self::assertResponseRedirects('/settings');
+        self::assertResponseRedirects('/parametres');
 
         $em->clear();
         $updated = $em->getRepository(User::class)->findOneBy(['email' => 'p4-new@example.test']);
@@ -153,7 +153,7 @@ class SettingsControllerTest extends WebTestCase
             'email' => 'p5@example.test',
             'currentPassword' => '',
         ]);
-        self::assertResponseRedirects('/settings');
+        self::assertResponseRedirects('/parametres');
 
         $em->clear();
         $reloaded = $em->getRepository(User::class)->findOneBy(['email' => 'p5@example.test']);
@@ -176,7 +176,7 @@ class SettingsControllerTest extends WebTestCase
             'newPassword' => 'NewSecret456',
             'confirmPassword' => 'NewSecret456',
         ]);
-        self::assertResponseRedirects('/settings');
+        self::assertResponseRedirects('/parametres');
 
         $em->clear();
         $reloaded = $em->getRepository(User::class)->findOneBy(['email' => 'pw1@example.test']);
@@ -199,7 +199,7 @@ class SettingsControllerTest extends WebTestCase
             'newPassword' => 'NewSecret456',
             'confirmPassword' => 'Different789',
         ]);
-        self::assertResponseRedirects('/settings');
+        self::assertResponseRedirects('/parametres');
 
         $em->clear();
         $reloaded = $em->getRepository(User::class)->findOneBy(['email' => 'pw2@example.test']);
@@ -222,7 +222,7 @@ class SettingsControllerTest extends WebTestCase
             'newPassword' => 'short',
             'confirmPassword' => 'short',
         ]);
-        self::assertResponseRedirects('/settings');
+        self::assertResponseRedirects('/parametres');
 
         $em->clear();
         $reloaded = $em->getRepository(User::class)->findOneBy(['email' => 'pw3@example.test']);
@@ -245,7 +245,7 @@ class SettingsControllerTest extends WebTestCase
             'newPassword' => 'NewSecret456',
             'confirmPassword' => 'NewSecret456',
         ]);
-        self::assertResponseRedirects('/settings');
+        self::assertResponseRedirects('/parametres');
 
         $em->clear();
         $reloaded = $em->getRepository(User::class)->findOneBy(['email' => 'pw4@example.test']);
@@ -266,7 +266,7 @@ class SettingsControllerTest extends WebTestCase
             '_token' => $token,
             'currentPassword' => 'WrongPass',
         ]);
-        self::assertResponseRedirects('/settings');
+        self::assertResponseRedirects('/parametres');
 
         $em->clear();
         $stillHere = $em->getRepository(User::class)->findOneBy(['email' => 'del1@example.test']);
@@ -303,7 +303,7 @@ class SettingsControllerTest extends WebTestCase
         $em->flush();
         $client->loginUser($user);
 
-        $client->request('GET', '/settings/export');
+        $client->request('GET', '/parametres/export');
         self::assertResponseIsSuccessful();
         self::assertSame('application/json', $client->getResponse()->headers->get('Content-Type'));
         self::assertStringStartsWith('attachment', (string) $client->getResponse()->headers->get('Content-Disposition'));
@@ -335,7 +335,7 @@ class SettingsControllerTest extends WebTestCase
             'email' => 'taken@example.test',
             'currentPassword' => 'Secret123',
         ]);
-        self::assertResponseRedirects('/settings');
+        self::assertResponseRedirects('/parametres');
 
         $em->clear();
         $stillMe = $em->getRepository(User::class)->findOneBy(['email' => 'me-uniq@example.test']);

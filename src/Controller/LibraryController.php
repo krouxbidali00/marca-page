@@ -20,7 +20,7 @@ class LibraryController extends AbstractController
     /** Common categories offered in the filter sidebar (in addition to any present in the active filter). */
     private const SUGGESTED_CATEGORIES = ['Roman', 'Essai', 'Poésie', 'Bande dessinée', 'Théâtre', 'Sciences humaines', 'Histoire', 'Jeunesse'];
 
-    #[Route('/library', name: 'app_library')]
+    #[Route('/bibliotheque', name: 'app_library')]
     public function index(Request $request, BookRepository $books, ShelfRepository $shelves): Response
     {
         /** @var User $user */

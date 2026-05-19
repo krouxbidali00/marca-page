@@ -19,7 +19,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 class BookController extends AbstractController
 {
-    #[Route('/books/{id}', name: 'app_book_show', requirements: ['id' => '\d+'], methods: ['GET'])]
+    #[Route('/livres/{id}', name: 'app_book_show', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function show(Book $book, BookRepository $books, ShelfRepository $shelves): Response
     {
         $this->denyAccessUnlessGranted(BookVoter::OWN, $book);

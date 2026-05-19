@@ -10,7 +10,7 @@ class RegistrationControllerTest extends WebTestCase
     public function testRegisterCreatesUserAndLogsIn(): void
     {
         $client = static::createClient();
-        $crawler = $client->request('GET', '/register');
+        $crawler = $client->request('GET', '/inscription');
         self::assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('Créer mon coffret')->form([
@@ -22,7 +22,7 @@ class RegistrationControllerTest extends WebTestCase
         ]);
         $client->submit($form);
 
-        self::assertResponseRedirects('/library');
+        self::assertResponseRedirects('/bibliotheque');
         $client->followRedirect();
         self::assertResponseIsSuccessful();
 
@@ -34,7 +34,7 @@ class RegistrationControllerTest extends WebTestCase
     public function testRegisterRejectsWeakPassword(): void
     {
         $client = static::createClient();
-        $crawler = $client->request('GET', '/register');
+        $crawler = $client->request('GET', '/inscription');
 
         $form = $crawler->selectButton('Créer mon coffret')->form([
             'registration_form[displayName]' => 'Bob',

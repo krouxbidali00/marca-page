@@ -15,7 +15,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER')]
 class BookSearchController extends AbstractController
 {
-    #[Route('/books/search', name: 'app_book_search', methods: ['GET'])]
+    #[Route('/livres/recherche', name: 'app_book_search', methods: ['GET'])]
     public function search(Request $request, GoogleBooksClientInterface $googleBooks): Response
     {
         $query = trim((string) $request->query->get('q', ''));

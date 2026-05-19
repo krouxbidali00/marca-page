@@ -19,7 +19,7 @@ class LibraryFragmentTest extends WebTestCase
         $em->flush();
         $client->loginUser($user);
 
-        $client->xmlHttpRequest('GET', '/library');
+        $client->xmlHttpRequest('GET', '/bibliotheque');
 
         self::assertResponseIsSuccessful();
         $body = (string) $client->getResponse()->getContent();
@@ -51,7 +51,7 @@ class LibraryFragmentTest extends WebTestCase
         $em->flush();
 
         $client->loginUser($user);
-        $client->xmlHttpRequest('GET', '/library?reading%5B%5D=reading');
+        $client->xmlHttpRequest('GET', '/bibliotheque?reading%5B%5D=reading');
 
         self::assertResponseIsSuccessful();
         $body = (string) $client->getResponse()->getContent();
@@ -79,7 +79,7 @@ class LibraryFragmentTest extends WebTestCase
         $em->flush();
 
         $client->loginUser($user);
-        $crawler = $client->xmlHttpRequest('GET', '/library?reading%5B%5D=reading');
+        $crawler = $client->xmlHttpRequest('GET', '/bibliotheque?reading%5B%5D=reading');
 
         self::assertResponseIsSuccessful();
         $paginationLinks = $crawler->filter('a.page-link')->extract(['href']);
