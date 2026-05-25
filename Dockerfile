@@ -61,4 +61,5 @@ RUN set -eux; \
     composer run-script --no-dev post-install-cmd; \
     chmod +x bin/console; \
     php bin/console sass:build; \
+    php bin/console asset-map:compile; \
     sync;
