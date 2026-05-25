@@ -1,6 +1,11 @@
 #!/bin/sh
 set -e
 
+# Railway provides PORT; Caddy uses SERVER_NAME to determine the bind address.
+if [ -n "$PORT" ] && [ -z "$SERVER_NAME" ]; then
+    export SERVER_NAME=":$PORT"
+fi
+
 if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 	if [ -z "$(ls -A 'vendor/' 2>/dev/null)" ]; then
 		composer install --prefer-dist --no-progress --no-interaction

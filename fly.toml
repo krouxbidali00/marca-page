@@ -6,6 +6,9 @@
 app = 'marca-page'
 primary_region = 'iad'
 
+[env]
+  SERVER_NAME = ":8080"
+
 [build]
 
 [http_service]
