@@ -96,8 +96,17 @@ class LibraryCacheInvalidationTest extends WebTestCase
         $client->request('POST', '/books/import', ['volumeId' => 'test-vol-1', '_token' => $token]);
         self::assertResponseRedirects();
 
-        // The library listing must now include the imported book — proves the cache was invalidated
+        // Follow the redirect to the book detail page so the flash message is consumed there,
+        // not leaked into the subsequent library GET (which would make the assertion pass even
+        // when the library cache is stale and the book card is absent).
+        $client->followRedirect();
+        self::assertResponseIsSuccessful();
+
+        // The library listing must now include the imported book — proves the cache was invalidated.
+        // At this point the flash is gone, so 'Étranger' can only appear in the book card itself.
         $client->request('GET', '/bibliotheque');
-        self::assertStringContainsString('Étranger', (string) $client->getResponse()->getContent());
+        $libraryHtml = (string) $client->getResponse()->getContent();
+        self::assertStringNotContainsString('Rien ici', $libraryHtml, 'Library must not show the empty-state message after import');
+        self::assertStringContainsString('Étranger', $libraryHtml, 'Library listing must show the imported book title');
     }
 }
