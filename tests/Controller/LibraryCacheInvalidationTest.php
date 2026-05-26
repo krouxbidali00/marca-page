@@ -8,9 +8,22 @@ use App\Enum\ReadingStatus;
 use App\Repository\BookRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class LibraryCacheInvalidationTest extends WebTestCase
 {
+    /**
+     * Clear the tag-aware cache pools after each test to prevent stale filesystem entries
+     * from leaking into subsequent tests (DAMA rolls back DB sequences, so user/book IDs
+     * can be reused across tests, making cache key collisions possible).
+     */
+    protected function tearDown(): void
+    {
+        static::getContainer()->get('cache.library')->clear();
+        static::getContainer()->get('cache.book_detail')->clear();
+        parent::tearDown();
+    }
+
     public function testRatingABookRefreshesLibraryListing(): void
     {
         $client = static::createClient();
