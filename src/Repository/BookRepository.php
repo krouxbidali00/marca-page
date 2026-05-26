@@ -10,6 +10,9 @@ use App\Pagination\Page;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 /**
  * @extends ServiceEntityRepository<Book>
@@ -18,8 +21,13 @@ class BookRepository extends ServiceEntityRepository
 {
     public const PER_PAGE = 24;
 
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        #[Autowire(service: 'cache.library')]
+        private readonly TagAwareCacheInterface $libraryCache,
+        #[Autowire(service: 'cache.book_detail')]
+        private readonly TagAwareCacheInterface $bookDetailCache,
+    ) {
         parent::__construct($registry, Book::class);
     }
 
@@ -27,6 +35,39 @@ class BookRepository extends ServiceEntityRepository
      * @return Page<Book>
      */
     public function paginateForLibrary(User $owner, LibraryFilter $filter): Page
+    {
+        $key = sprintf('v1.lib.%d.%s', (int) $owner->getId(), hash('xxh128', $filter->cacheSignature()));
+
+        return $this->libraryCache->get($key, function (ItemInterface $item) use ($owner, $filter): Page {
+            $item->expiresAfter(3600);
+            $item->tag(['user.' . (int) $owner->getId() . '.library']);
+
+            return $this->doPaginateForLibrary($owner, $filter);
+        });
+    }
+
+    public function findCachedForDetail(int $bookId): ?Book
+    {
+        $key = sprintf('v1.book.%d', $bookId);
+
+        return $this->bookDetailCache->get($key, function (ItemInterface $item) use ($bookId): ?Book {
+            $item->expiresAfter(3600);
+            $item->tag(['book.' . $bookId]);
+
+            return $this->createQueryBuilder('b')
+                ->leftJoin('b.shelf', 's')->addSelect('s')
+                ->leftJoin('b.owner', 'o')->addSelect('o')
+                ->leftJoin('b.quotes', 'q')->addSelect('q')
+                ->where('b.id = :id')->setParameter('id', $bookId)
+                ->getQuery()
+                ->getOneOrNullResult();
+        });
+    }
+
+    /**
+     * @return Page<Book>
+     */
+    private function doPaginateForLibrary(User $owner, LibraryFilter $filter): Page
     {
         $qb = $this->createQueryBuilder('b')
             ->leftJoin('b.shelf', 's')->addSelect('s')

@@ -28,3 +28,7 @@
 ###> symfonycasts/sass-bundle ###
 /public/assets/
 ###< symfonycasts/sass-bundle ###
+
+###> claude/superpowers ###
+docs/superpowers/
+###< claude/superpowers ###

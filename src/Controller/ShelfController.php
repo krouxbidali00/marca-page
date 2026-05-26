@@ -8,6 +8,7 @@ use App\Repository\BookRepository;
 use App\Repository\ShelfRepository;
 use App\Security\ShelfVoter;
 use App\Service\CoverThemePicker;
+use App\Service\LibraryCacheInvalidator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -45,7 +46,7 @@ class ShelfController extends AbstractController
     }
 
     #[Route('/shelves', name: 'app_shelf_create', methods: ['POST'])]
-    public function create(Request $request, EntityManagerInterface $em): Response
+    public function create(Request $request, EntityManagerInterface $em, LibraryCacheInvalidator $cacheInvalidator): Response
     {
         if (!$this->isCsrfTokenValid('create_shelf', (string) $request->request->get('_token'))) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
@@ -58,6 +59,7 @@ class ShelfController extends AbstractController
             $shelf = (new Shelf())->setOwner($user)->setName(mb_substr($name, 0, 80));
             $em->persist($shelf);
             $em->flush();
+            $cacheInvalidator->invalidateLibrary($user);
             $this->addFlash('success', \sprintf('Étagère « %s » créée.', $shelf->getName()));
         }
 
@@ -67,7 +69,7 @@ class ShelfController extends AbstractController
     }
 
     #[Route('/shelves/{id}/rename', name: 'app_shelf_rename', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function rename(Shelf $shelf, Request $request, EntityManagerInterface $em): Response
+    public function rename(Shelf $shelf, Request $request, EntityManagerInterface $em, LibraryCacheInvalidator $cacheInvalidator): Response
     {
         $this->denyAccessUnlessGranted(ShelfVoter::OWN, $shelf);
 
@@ -84,13 +86,14 @@ class ShelfController extends AbstractController
 
         $shelf->setName(mb_substr($name, 0, 80));
         $em->flush();
+        $cacheInvalidator->invalidateLibrary($shelf->getOwner());
         $this->addFlash('success', \sprintf('Étagère renommée en « %s ».', $shelf->getName()));
 
         return $this->redirectToRoute('app_shelf_index');
     }
 
     #[Route('/shelves/{id}/delete', name: 'app_shelf_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function delete(Shelf $shelf, Request $request, EntityManagerInterface $em): Response
+    public function delete(Shelf $shelf, Request $request, EntityManagerInterface $em, LibraryCacheInvalidator $cacheInvalidator): Response
     {
         $this->denyAccessUnlessGranted(ShelfVoter::OWN, $shelf);
 
@@ -99,8 +102,10 @@ class ShelfController extends AbstractController
         }
 
         $name = $shelf->getName();
+        $owner = $shelf->getOwner();
         $em->remove($shelf);
         $em->flush();
+        $cacheInvalidator->invalidateLibrary($owner);
         $this->addFlash('success', \sprintf('Étagère « %s » supprimée.', $name));
 
         return $this->redirectToRoute('app_shelf_index');

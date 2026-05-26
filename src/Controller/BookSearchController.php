@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Service\BookImporter;
 use App\Service\GoogleBooksClientInterface;
 use App\Service\GoogleBooksException;
+use App\Service\LibraryCacheInvalidator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -42,8 +43,11 @@ class BookSearchController extends AbstractController
     }
 
     #[Route('/books/import', name: 'app_book_import', methods: ['POST'])]
-    public function import(Request $request, BookImporter $importer): Response
-    {
+    public function import(
+        Request $request,
+        BookImporter $importer,
+        LibraryCacheInvalidator $cacheInvalidator,
+    ): Response {
         if (!$this->isCsrfTokenValid('import_book', (string) $request->request->get('_token'))) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
@@ -65,6 +69,7 @@ class BookSearchController extends AbstractController
             return $this->redirectToRoute('app_book_search', ['q' => (string) $request->request->get('q', '')]);
         }
 
+        $cacheInvalidator->invalidateLibrary($user);
         $this->addFlash('success', \sprintf('« %s » a été ajouté à votre bibliothèque.', $book->getTitle()));
 
         return $this->redirectToRoute('app_book_show', ['id' => $book->getId()]);

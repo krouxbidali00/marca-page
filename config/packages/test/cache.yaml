@@ -1,0 +1,16 @@
+framework:
+    cache:
+        pools:
+            # Array adapter for google_books: it does not need cross-request persistence in tests.
+            cache.google_books:
+                adapter: cache.adapter.array
+            # Filesystem adapters for the tag-aware pools: the filesystem backend survives the
+            # services_resetter that runs between HTTP requests, so functional tests that warm
+            # the cache on one request and assert invalidation on the next actually exercise the
+            # real invalidation path. Tests must call clear() on these pools in tearDown().
+            cache.library:
+                adapter: cache.adapter.filesystem
+                tags: true
+            cache.book_detail:
+                adapter: cache.adapter.filesystem
+                tags: true
