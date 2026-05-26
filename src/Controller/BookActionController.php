@@ -8,6 +8,7 @@ use App\Enum\PurchaseStatus;
 use App\Enum\ReadingStatus;
 use App\Repository\ShelfRepository;
 use App\Security\BookVoter;
+use App\Service\LibraryCacheInvalidator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,8 +21,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/books/{id}', requirements: ['id' => '\d+'], methods: ['POST'])]
 class BookActionController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $em)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly LibraryCacheInvalidator $cacheInvalidator,
+    ) {
     }
 
     #[Route('/reading-progress', name: 'app_book_reading_progress')]
@@ -38,6 +41,8 @@ class BookActionController extends AbstractController
             $book->setCurrentPage($page === '' || $page === null ? null : max(0, (int) $page));
         }
         $this->em->flush();
+        $this->cacheInvalidator->invalidateLibrary($book->getOwner());
+        $this->cacheInvalidator->invalidateBook($book);
 
         return $this->respond($book, 'Progression mise à jour.');
     }
@@ -60,6 +65,8 @@ class BookActionController extends AbstractController
             $book->setPurchasedAt($date !== '' ? new \DateTimeImmutable($date) : null);
         }
         $this->em->flush();
+        $this->cacheInvalidator->invalidateLibrary($book->getOwner());
+        $this->cacheInvalidator->invalidateBook($book);
 
         return $this->respond($book, 'Statut d\'achat mis à jour.');
     }
@@ -72,6 +79,8 @@ class BookActionController extends AbstractController
         $value = $request->request->get('rating');
         $book->setRating($value === '' || $value === null ? null : (int) $value);
         $this->em->flush();
+        $this->cacheInvalidator->invalidateLibrary($book->getOwner());
+        $this->cacheInvalidator->invalidateBook($book);
 
         if ($request->isXmlHttpRequest()) {
             return new JsonResponse(['rating' => $book->getRating()]);
@@ -88,6 +97,8 @@ class BookActionController extends AbstractController
         $notes = trim((string) $request->request->get('personalNotes', ''));
         $book->setPersonalNotes($notes !== '' ? $notes : null);
         $this->em->flush();
+        $this->cacheInvalidator->invalidateLibrary($book->getOwner());
+        $this->cacheInvalidator->invalidateBook($book);
 
         if ($request->isXmlHttpRequest()) {
             return new JsonResponse(['ok' => true, 'savedAt' => (new \DateTimeImmutable())->format('c')]);
@@ -110,6 +121,8 @@ class BookActionController extends AbstractController
             $book->setShelf($shelves->findOneBy(['id' => (int) $shelfId, 'owner' => $user]));
         }
         $this->em->flush();
+        $this->cacheInvalidator->invalidateLibrary($book->getOwner());
+        $this->cacheInvalidator->invalidateBook($book);
 
         return $this->respond($book, 'Étagère mise à jour.');
     }
