@@ -78,6 +78,7 @@ class CachedGoogleBooksClientTest extends TestCase
         $inner = $this->createMock(GoogleBooksClientInterface::class);
         $inner->expects(self::once())
             ->method('search')
+            ->with('Camus', 20)
             ->willReturn([$this->makeResult('abc', "L'Étranger")]);
 
         $client = new CachedGoogleBooksClient($inner, new ArrayAdapter());
