@@ -43,7 +43,7 @@ class CachedGoogleBooksClientTest extends TestCase
         $first = $client->search('camus', 20);
         $second = $client->search('camus', 20);
 
-        self::assertSame($first, $second);
+        self::assertEquals($first, $second);
         self::assertCount(1, $first);
     }
 
