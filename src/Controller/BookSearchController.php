@@ -8,6 +8,7 @@ use App\Service\GoogleBooksClientInterface;
 use App\Service\GoogleBooksException;
 use App\Service\LibraryCacheInvalidator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -54,8 +55,12 @@ class BookSearchController extends AbstractController
 
         /** @var User $user */
         $user = $this->getUser();
+        $isXhr = $request->isXmlHttpRequest();
         $volumeId = trim((string) $request->request->get('volumeId', ''));
         if ($volumeId === '') {
+            if ($isXhr) {
+                return new JsonResponse(['ok' => false, 'error' => 'Livre invalide.'], 400);
+            }
             $this->addFlash('danger', 'Livre invalide.');
 
             return $this->redirectToRoute('app_book_search');
@@ -64,12 +69,23 @@ class BookSearchController extends AbstractController
         try {
             $book = $importer->importFromGoogle($user, $volumeId);
         } catch (GoogleBooksException) {
+            if ($isXhr) {
+                return new JsonResponse(
+                    ['ok' => false, 'error' => 'Impossible de récupérer ce livre depuis Google Books.'],
+                    502,
+                );
+            }
             $this->addFlash('danger', 'Impossible de récupérer ce livre depuis Google Books.');
 
             return $this->redirectToRoute('app_book_search', ['q' => (string) $request->request->get('q', '')]);
         }
 
         $cacheInvalidator->invalidateLibrary($user);
+
+        if ($isXhr) {
+            return new JsonResponse(['ok' => true, 'title' => $book->getTitle()]);
+        }
+
         $this->addFlash('success', \sprintf('« %s » a été ajouté à votre bibliothèque.', $book->getTitle()));
 
         return $this->redirectToRoute('app_book_show', ['id' => $book->getId()]);
