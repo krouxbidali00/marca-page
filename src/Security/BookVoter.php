@@ -24,6 +24,6 @@ final class BookVoter extends Voter
     {
         $user = $token->getUser();
 
-        return $user instanceof User && $subject instanceof Book && $subject->getOwner() === $user;
+        return $user instanceof User && $subject instanceof Book && $subject->getOwner()?->getId() === $user->getId();
     }
 }
