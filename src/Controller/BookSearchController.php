@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Repository\BookRepository;
 use App\Service\BookImporter;
 use App\Service\GoogleBooksClientInterface;
 use App\Service\GoogleBooksException;
@@ -18,8 +19,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class BookSearchController extends AbstractController
 {
     #[Route('/livres/recherche', name: 'app_book_search', methods: ['GET'])]
-    public function search(Request $request, GoogleBooksClientInterface $googleBooks): Response
-    {
+    public function search(
+        Request $request,
+        GoogleBooksClientInterface $googleBooks,
+        BookRepository $bookRepository,
+    ): Response {
         $query = trim((string) $request->query->get('q', ''));
         $results = [];
         $error = null;
@@ -32,6 +36,13 @@ class BookSearchController extends AbstractController
             }
         }
 
+        /** @var User $user */
+        $user = $this->getUser();
+        $ownedVolumeIds = $bookRepository->findOwnedGoogleVolumeIds(
+            $user,
+            array_map(static fn ($result) => $result->volumeId, $results),
+        );
+
         $template = $request->query->getBoolean('fragment')
             ? 'book/_search_results.html.twig'
             : 'book/search.html.twig';
@@ -40,6 +51,7 @@ class BookSearchController extends AbstractController
             'query' => $query,
             'results' => $results,
             'error' => $error,
+            'ownedVolumeIds' => $ownedVolumeIds,
         ]);
     }
 
