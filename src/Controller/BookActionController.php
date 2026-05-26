@@ -97,7 +97,6 @@ class BookActionController extends AbstractController
         $notes = trim((string) $request->request->get('personalNotes', ''));
         $book->setPersonalNotes($notes !== '' ? $notes : null);
         $this->em->flush();
-        $this->cacheInvalidator->invalidateLibrary($book->getOwner());
         $this->cacheInvalidator->invalidateBook($book);
 
         if ($request->isXmlHttpRequest()) {
