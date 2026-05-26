@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Book;
 use App\Entity\Quote;
 use App\Security\BookVoter;
+use App\Service\LibraryCacheInvalidator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,8 +18,10 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[IsGranted('ROLE_USER')]
 class QuoteController extends AbstractController
 {
-    public function __construct(private readonly EntityManagerInterface $em)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly LibraryCacheInvalidator $cacheInvalidator,
+    ) {
     }
 
     #[Route('/books/{id}/quotes', name: 'app_quote_add', requirements: ['id' => '\d+'], methods: ['POST'])]
@@ -38,6 +41,7 @@ class QuoteController extends AbstractController
         } else {
             $this->em->persist($quote);
             $this->em->flush();
+            $this->cacheInvalidator->invalidateBook($book);
             $this->addFlash('success', 'Citation ajoutée.');
         }
 
@@ -55,6 +59,7 @@ class QuoteController extends AbstractController
 
         $this->em->remove($quote);
         $this->em->flush();
+        $this->cacheInvalidator->invalidateBook($book);
         $this->addFlash('success', 'Citation supprimée.');
 
         return $this->redirectToRoute('app_book_show', ['id' => $book->getId()]);
