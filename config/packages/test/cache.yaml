@@ -1,0 +1,11 @@
+framework:
+    cache:
+        pools:
+            cache.google_books:
+                adapter: cache.adapter.array
+            cache.library:
+                adapter: cache.adapter.array
+                tags: true
+            cache.book_detail:
+                adapter: cache.adapter.array
+                tags: true
