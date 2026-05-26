@@ -21,8 +21,13 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class BookController extends AbstractController
 {
     #[Route('/livres/{id}', name: 'app_book_show', requirements: ['id' => '\d+'], methods: ['GET'])]
-    public function show(Book $book, BookRepository $books, ShelfRepository $shelves): Response
+    public function show(int $id, BookRepository $books, ShelfRepository $shelves): Response
     {
+        $book = $books->findCachedForDetail($id);
+        if ($book === null) {
+            throw $this->createNotFoundException();
+        }
+
         $this->denyAccessUnlessGranted(BookVoter::OWN, $book);
         /** @var User $user */
         $user = $this->getUser();

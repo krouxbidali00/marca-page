@@ -25,6 +25,8 @@ class BookRepository extends ServiceEntityRepository
         ManagerRegistry $registry,
         #[Autowire(service: 'cache.library')]
         private readonly TagAwareCacheInterface $libraryCache,
+        #[Autowire(service: 'cache.book_detail')]
+        private readonly TagAwareCacheInterface $bookDetailCache,
     ) {
         parent::__construct($registry, Book::class);
     }
@@ -41,6 +43,24 @@ class BookRepository extends ServiceEntityRepository
             $item->tag(['user.' . (int) $owner->getId() . '.library']);
 
             return $this->doPaginateForLibrary($owner, $filter);
+        });
+    }
+
+    public function findCachedForDetail(int $bookId): ?Book
+    {
+        $key = sprintf('v1.book.%d', $bookId);
+
+        return $this->bookDetailCache->get($key, function (ItemInterface $item) use ($bookId): ?Book {
+            $item->expiresAfter(3600);
+            $item->tag(['book.' . $bookId]);
+
+            return $this->createQueryBuilder('b')
+                ->leftJoin('b.shelf', 's')->addSelect('s')
+                ->leftJoin('b.owner', 'o')->addSelect('o')
+                ->leftJoin('b.quotes', 'q')->addSelect('q')
+                ->where('b.id = :id')->setParameter('id', $bookId)
+                ->getQuery()
+                ->getOneOrNullResult();
         });
     }
 
