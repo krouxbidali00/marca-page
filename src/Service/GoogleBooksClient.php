@@ -15,6 +15,8 @@ class GoogleBooksClient implements GoogleBooksClientInterface
         private readonly HttpClientInterface $httpClient,
         #[Autowire('%env(GOOGLE_BOOKS_API_KEY)%')]
         private readonly string $apiKey = '',
+        #[Autowire('%env(GOOGLE_BOOKS_LANG_RESTRICT)%')]
+        private readonly string $languageRestrict = '',
     ) {
     }
 
@@ -31,6 +33,10 @@ class GoogleBooksClient implements GoogleBooksClientInterface
             'printType' => 'books',
             'orderBy' => 'relevance',
         ];
+
+        if ($this->languageRestrict !== '') {
+            $params['langRestrict'] = $this->languageRestrict;
+        }
 
         try {
             $data = $this->request(self::BASE, $params);

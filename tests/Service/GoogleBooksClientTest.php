@@ -98,6 +98,36 @@ class GoogleBooksClientTest extends TestCase
         self::assertSame('Le Procès', $results[0]->title);
     }
 
+    public function testSearchAppliesLanguageRestrictWhenConfigured(): void
+    {
+        $capturedQuery = [];
+        $httpClient = new MockHttpClient(function (string $method, string $url, array $options) use (&$capturedQuery): MockResponse {
+            $capturedQuery = $options['query'] ?? [];
+
+            return new MockResponse(json_encode(['items' => []], JSON_THROW_ON_ERROR));
+        });
+
+        $client = new GoogleBooksClient($httpClient, '', 'fr');
+        $client->search('camus');
+
+        self::assertSame('fr', $capturedQuery['langRestrict'] ?? null);
+    }
+
+    public function testSearchOmitsLanguageRestrictWhenEmpty(): void
+    {
+        $capturedQuery = [];
+        $httpClient = new MockHttpClient(function (string $method, string $url, array $options) use (&$capturedQuery): MockResponse {
+            $capturedQuery = $options['query'] ?? [];
+
+            return new MockResponse(json_encode(['items' => []], JSON_THROW_ON_ERROR));
+        });
+
+        $client = new GoogleBooksClient($httpClient, '', '');
+        $client->search('camus');
+
+        self::assertArrayNotHasKey('langRestrict', $capturedQuery);
+    }
+
     public function testGetVolumeMapsVolume(): void
     {
         $json = json_encode([
