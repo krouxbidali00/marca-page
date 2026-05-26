@@ -22,7 +22,7 @@
                         <div class="font-serif fs-5 fw-semibold lh-sm">{{ result.title }}</div>
                         {% if result.subtitle %}<div class="text-mute small fst-italic">{{ result.subtitle }}</div>{% endif %}
                         <div class="text-mute small mb-1">{{ result.authorsLine }}{% if result.publisher %} · {{ result.publisher }}{% endif %}{% if result.publishedYear %} · {{ result.publishedYear }}{% endif %}{% if result.pageCount %} · {{ result.pageCount }} p.{% endif %}</div>
-                        {% if result.description %}<p class="text-mute small mb-0">{{ result.description|length > 180 ? result.description|slice(0, 180) ~ '…' : result.description }}</p>{% endif %}
+                        {% if result.description %}{% set desc = result.description|striptags %}<p class="text-mute small mb-0">{{ desc|length > 180 ? desc|slice(0, 180) ~ '…' : desc }}</p>{% endif %}
                     </div>
                     <form method="post" action="{{ path('app_book_import') }}" class="flex-shrink-0">
                         <input type="hidden" name="_token" value="{{ csrf_token('import_book') }}">

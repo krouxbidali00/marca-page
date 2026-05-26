@@ -1,6 +1,6 @@
 {# Params (from context): book, similar #}
 {% if book.description %}
-    <p class="fs-5 lh-lg mb-3">{{ book.description|nl2br }}</p>
+    <div class="fs-5 lh-lg mb-3">{{ book.description|sanitize_html }}</div>
 {% else %}
     <p class="text-mute fst-italic mb-3">Aucun résumé fourni par Google Books pour ce livre.</p>
 {% endif %}
