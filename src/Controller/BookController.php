@@ -9,6 +9,7 @@ use App\Enum\ReadingStatus;
 use App\Repository\BookRepository;
 use App\Repository\ShelfRepository;
 use App\Security\BookVoter;
+use App\Service\LibraryCacheInvalidator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,16 +37,25 @@ class BookController extends AbstractController
     }
 
     #[Route('/books/{id}/delete', name: 'app_book_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function delete(Book $book, Request $request, EntityManagerInterface $em): Response
-    {
+    public function delete(
+        Book $book,
+        Request $request,
+        EntityManagerInterface $em,
+        LibraryCacheInvalidator $cacheInvalidator,
+    ): Response {
         $this->denyAccessUnlessGranted(BookVoter::OWN, $book);
 
         if (!$this->isCsrfTokenValid('delete_book_' . $book->getId(), (string) $request->request->get('_token'))) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
+        $owner = $book->getOwner();
+        $cacheInvalidator->invalidateBook($book);
+
         $em->remove($book);
         $em->flush();
+
+        $cacheInvalidator->invalidateLibrary($owner);
         $this->addFlash('success', 'Livre retiré de votre bibliothèque.');
 
         return $this->redirectToRoute('app_library');
