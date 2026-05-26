@@ -44,7 +44,12 @@ docker compose exec php bin/phpunit --filter testImportAddsBookToLibrary  # one 
 `dama/doctrine-test-bundle` wraps every test in a rolled-back transaction, so the
 test DB is never polluted. Functional tests extend `WebTestCase` and persist their
 own `User` then `$client->loginUser($user)`. In the test env, passwords use the
-`plaintext` hasher (see `config/packages/security.yaml`).
+`plaintext` hasher (see `config/packages/security.yaml`). The tag-aware cache pools
+(`cache.library`, `cache.book_detail`) keep the **filesystem** adapter in the test env
+(`config/packages/test/cache.yaml`) so they survive the `services_resetter` between
+requests — this lets functional tests warm the cache on one request and assert
+invalidation on the next; such tests must `clear()` those pools in `tearDown()`.
+`cache.google_books` uses the `array` adapter there (no cross-request persistence needed).
 
 ## Lint
 
@@ -79,36 +84,66 @@ consumed directly by Twig.
 
 **Google Books integration.** `GoogleBooksClientInterface` → `GoogleBooksClient` (real
 HTTP client; reads `GOOGLE_BOOKS_API_KEY` env var, falls back to anonymous low-quota
-requests; retries broad queries with an `intitle:` qualifier on 5xx). In the test env
-`services.yaml` swaps in `App\Tests\Double\FakeGoogleBooksClient`. `BookImporter` maps a
-`GoogleBookResult` DTO into a `Book` and dedupes on `(owner, googleVolumeId)`.
+requests; retries broad queries with an `intitle:` qualifier on 5xx; restricts results to
+`GOOGLE_BOOKS_LANG_RESTRICT` via the `langRestrict` param when that env var is non-empty).
+`CachedGoogleBooksClient` decorates it (`#[AsDecorator]`) to cache `search()` / `getVolume()`
+results (see **Caching**). In the test env `services.yaml` swaps in
+`App\Tests\Double\FakeGoogleBooksClient`. `BookImporter` maps a `GoogleBookResult` DTO into a
+`Book` and dedupes on `(owner, googleVolumeId)`.
 `CoverThemePicker` derives a stable theme `0..11` from the title (`crc32 % 12`) so books
 without a thumbnail render a palette-matching CSS cover (`.cover--theme-N`).
 
 **Controllers / routing.** Attribute-based routing, one controller per area
 (`HomeController`, `LibraryController`, `BookController`, `BookActionController`,
 `BookSearchController`, `QuoteController`, `ShelfController`, `RegistrationController`,
-`SecurityController`). `BookActionController` is `#[Route('/books/{id}', methods: ['POST'])]`
-with sub-routes for each editable facet (reading-progress, purchase, rating, notes, shelf);
-the rating and notes actions also return JSON when `X-Requested-With` is set.
+`SecurityController`, `SettingsController`, `StatsController`). `BookActionController` is
+`#[Route('/books/{id}', methods: ['POST'])]` with sub-routes for each editable facet
+(reading-progress, purchase, rating, notes, shelf); the rating and notes actions also return
+JSON when `X-Requested-With` is set. `BookSearchController::import()` likewise returns a
+`JsonResponse` on XHR (otherwise a redirect with a flash) so a book can be added without
+leaving the search page. `SettingsController` (`/parametres`) handles profile, password
+change, account deletion, and a JSON library export (`/parametres/export`, via
+`LibraryExporter`). `StatsController` (`/statistiques`) renders reading stats from
+`StatsAggregator::compute()` over a `StatsPeriod` (`all` / `30d` / `year`).
 
 **Authorization.** Form login (`config/packages/security.yaml`): `access_control` makes
 everything except `/`, `/login`, `/register` require `ROLE_USER`, and controllers also
-declare `#[IsGranted('ROLE_USER')]`. Per-book ownership goes through `BookVoter` — every
-book-scoped action calls `denyAccessUnlessGranted(BookVoter::OWN, $book)`. Mutating
-endpoints additionally validate a per-book CSRF token (`book_action_<id>`, `delete_book_<id>`,
-`import_book`, `create_shelf`); CSRF is **session-based** so forms work without JS.
+declare `#[IsGranted('ROLE_USER')]`. Per-book ownership goes through `BookVoter`
+(`BookVoter::OWN`) and per-shelf ownership through `ShelfVoter` (`ShelfVoter::OWN`); scoped
+actions call `denyAccessUnlessGranted(...)`. `BookVoter` compares owner **by ID** (not object
+identity) so entities served from cache still pass (see **Caching**). Mutating endpoints
+additionally validate a CSRF token (`book_action_<id>`, `delete_book_<id>`, `import_book`,
+`create_shelf`, `settings_profile`, `settings_password`, `settings_delete`); CSRF is
+**session-based** so forms work without JS.
 
 **Library listing.** `LibraryFilter` (readonly DTO) is built from request query params via
 `fromRequest()` and validated/clamped there; it drives `BookRepository::paginateForLibrary()`,
-which returns a generic `Page<Book>` value object (page math, ranges, prev/next). `toQueryParams()`
-rebuilds the current filter state for pagination links and "remove this filter" chips.
+which returns a generic `Page<Book>` value object (page math, ranges, prev/next) and is served
+through the tagged `library` cache (keyed by `LibraryFilter::cacheSignature()`; see **Caching**).
+`toQueryParams()` rebuilds the current filter state for pagination links and "remove this
+filter" chips.
+
+**Caching.** Three filesystem pools (`config/packages/cache.yaml`): `cache.google_books`
+(24 h TTL, untagged) and the tag-aware `cache.library` and `cache.book_detail` (1 h TTL each).
+`CachedGoogleBooksClient` caches Google Books `search()` / `getVolume()` (xxh128 keys).
+`BookRepository::paginateForLibrary()` is served through the `library` pool, keyed by
+`LibraryFilter::cacheSignature()` (deterministic, order-insensitive) and tagged
+`user.{id}.library`; `findCachedForDetail()` caches a book's detail tagged `book.{id}`. The
+`LibraryCacheInvalidator` facade (`invalidateLibrary()` / `invalidateBook()`) is called from
+mutating book / shelf / quote actions and on import to drop the relevant tags. `BookVoter`
+compares owner **by ID** (not object identity) so entities served from cache still pass
+authorization. `HomeController` sets a public `Cache-Control` (`setSharedMaxAge(3600)`,
+`setMaxAge(600)`) for anonymous visitors.
 
 **Frontend.** AssetMapper + importmap (`importmap.php`) — no JS bundler/build step. Stimulus
-controllers live in `assets/controllers/` (`password-toggle`, `password-strength`, `rating`,
-`notes-autosave`, `book-search` live search). Turbo is enabled (`turbo-core`, eager fetch).
-SCSS is compiled by `symfonycasts/sass-bundle`; **all custom styles live in `assets/styles/*.scss`**
-(partials `@use`d from `app.scss`) — no inline styles in Twig templates. Twig: `templates/base.html.twig`
+controllers live in `assets/controllers/`: `password-toggle`, `password-strength`, `rating`,
+`notes-autosave`, `book-search` (live search), `book-import` (XHR import that keeps you on the
+search page), `library` (filter UI), `shelves`, `settings-profile`, `settings-delete`,
+`stats-chart` (Chart.js wrapper, loaded via importmap), and `csrf_protection`. Turbo is enabled
+(`turbo-core`, eager fetch). SCSS is compiled by `symfonycasts/sass-bundle`; **all custom styles
+live in `assets/styles/*.scss`** (partials `@use`d from `app.scss`) — no inline styles in Twig
+templates. Book descriptions render through the `sanitize_html` Twig filter
+(`symfony/html-sanitizer`); search-result previews use `striptags`. Twig: `templates/base.html.twig`
 is the layout; `templates/_partials/` holds shared fragments (navbars, badges, pagination, stars,
 flash messages); fragment templates prefixed `_` (e.g. `book/_search_results.html.twig`,
 `library/_grid.html.twig`) are rendered for Turbo/AJAX partial updates.
