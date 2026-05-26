@@ -111,6 +111,34 @@ final readonly class LibraryFilter
     }
 
     /**
+     * A deterministic textual signature of all filter values, used as a stable cache key.
+     * Order-insensitive on arrays (sorts each axis) so equivalent filters collide.
+     */
+    public function cacheSignature(): string
+    {
+        $reading = array_map(static fn (ReadingStatus $s): string => $s->value, $this->readingStatuses);
+        sort($reading);
+
+        $purchase = array_map(static fn (PurchaseStatus $s): string => $s->value, $this->purchaseStatuses);
+        sort($purchase);
+
+        $categories = $this->categories;
+        sort($categories);
+
+        return implode('|', [
+            'q=' . $this->query,
+            'reading=' . implode(',', $reading),
+            'purchase=' . implode(',', $purchase),
+            'categories=' . implode(',', $categories),
+            'minRating=' . ($this->minRating ?? ''),
+            'maxPages=' . ($this->maxPages ?? ''),
+            'shelf=' . ($this->shelfId ?? ''),
+            'sort=' . $this->sort,
+            'page=' . $this->page,
+        ]);
+    }
+
+    /**
      * Current state as a query-parameters array, optionally with one value removed
      * (used for the "remove this filter" chips and for pagination links).
      *

@@ -81,4 +81,61 @@ class LibraryFilterTest extends TestCase
             'sort' => 'rating',
         ], $f->toQueryParams());
     }
+
+    public function testCacheSignatureIsDeterministic(): void
+    {
+        $a = new LibraryFilter(query: 'camus', readingStatuses: [ReadingStatus::Reading], page: 2, sort: 'title_asc');
+        $b = new LibraryFilter(query: 'camus', readingStatuses: [ReadingStatus::Reading], page: 2, sort: 'title_asc');
+
+        self::assertSame($a->cacheSignature(), $b->cacheSignature());
+    }
+
+    public function testCacheSignatureChangesWithQuery(): void
+    {
+        $a = new LibraryFilter(query: 'camus');
+        $b = new LibraryFilter(query: 'kafka');
+
+        self::assertNotSame($a->cacheSignature(), $b->cacheSignature());
+    }
+
+    public function testCacheSignatureChangesWithPage(): void
+    {
+        $a = new LibraryFilter(page: 1);
+        $b = new LibraryFilter(page: 2);
+
+        self::assertNotSame($a->cacheSignature(), $b->cacheSignature());
+    }
+
+    public function testCacheSignatureChangesWithSort(): void
+    {
+        $a = new LibraryFilter(sort: 'recent');
+        $b = new LibraryFilter(sort: 'title_asc');
+
+        self::assertNotSame($a->cacheSignature(), $b->cacheSignature());
+    }
+
+    public function testCacheSignatureIsIndependentOfArrayOrder(): void
+    {
+        $a = new LibraryFilter(readingStatuses: [ReadingStatus::Reading, ReadingStatus::Finished]);
+        $b = new LibraryFilter(readingStatuses: [ReadingStatus::Finished, ReadingStatus::Reading]);
+
+        self::assertSame($a->cacheSignature(), $b->cacheSignature());
+    }
+
+    public function testCacheSignatureIncludesPurchaseStatusesCategoriesShelfRatingPages(): void
+    {
+        $base = new LibraryFilter();
+        $withPurchase = new LibraryFilter(purchaseStatuses: [PurchaseStatus::Bought]);
+        $withCategory = new LibraryFilter(categories: ['Fiction']);
+        $withShelf = new LibraryFilter(shelfId: 7);
+        $withRating = new LibraryFilter(minRating: 4);
+        $withPages = new LibraryFilter(maxPages: 300);
+
+        $signatures = array_map(
+            static fn (LibraryFilter $f): string => $f->cacheSignature(),
+            [$base, $withPurchase, $withCategory, $withShelf, $withRating, $withPages],
+        );
+
+        self::assertCount(6, array_unique($signatures), 'each filter axis must alter the signature');
+    }
 }
