@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
 use Symfony\Component\Routing\Attribute\Route;
 
 class HomeController extends AbstractController
@@ -15,6 +16,14 @@ class HomeController extends AbstractController
             return $this->redirectToRoute('app_library');
         }
 
-        return $this->render('home/index.html.twig');
+        $response = $this->render('home/index.html.twig');
+        $response->setPublic();
+        $response->setSharedMaxAge(3600);
+        $response->setMaxAge(600);
+        // Prevent AbstractSessionListener from overriding these headers when the
+        // session is touched (e.g. by the remember-me listener on anonymous requests).
+        $response->headers->set(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER, '1');
+
+        return $response;
     }
 }
