@@ -91,16 +91,25 @@ without a thumbnail render a palette-matching CSS cover (`.cover--theme-N`).
 **Controllers / routing.** Attribute-based routing, one controller per area
 (`HomeController`, `LibraryController`, `BookController`, `BookActionController`,
 `BookSearchController`, `QuoteController`, `ShelfController`, `RegistrationController`,
-`SecurityController`). `BookActionController` is `#[Route('/books/{id}', methods: ['POST'])]`
-with sub-routes for each editable facet (reading-progress, purchase, rating, notes, shelf);
-the rating and notes actions also return JSON when `X-Requested-With` is set.
+`SecurityController`, `SettingsController`, `StatsController`). `BookActionController` is
+`#[Route('/books/{id}', methods: ['POST'])]` with sub-routes for each editable facet
+(reading-progress, purchase, rating, notes, shelf); the rating and notes actions also return
+JSON when `X-Requested-With` is set. `BookSearchController::import()` likewise returns a
+`JsonResponse` on XHR (otherwise a redirect with a flash) so a book can be added without
+leaving the search page. `SettingsController` (`/parametres`) handles profile, password
+change, account deletion, and a JSON library export (`/parametres/export`, via
+`LibraryExporter`). `StatsController` (`/statistiques`) renders reading stats from
+`StatsAggregator::compute()` over a `StatsPeriod` (`all` / `30d` / `year`).
 
 **Authorization.** Form login (`config/packages/security.yaml`): `access_control` makes
 everything except `/`, `/login`, `/register` require `ROLE_USER`, and controllers also
-declare `#[IsGranted('ROLE_USER')]`. Per-book ownership goes through `BookVoter` — every
-book-scoped action calls `denyAccessUnlessGranted(BookVoter::OWN, $book)`. Mutating
-endpoints additionally validate a per-book CSRF token (`book_action_<id>`, `delete_book_<id>`,
-`import_book`, `create_shelf`); CSRF is **session-based** so forms work without JS.
+declare `#[IsGranted('ROLE_USER')]`. Per-book ownership goes through `BookVoter`
+(`BookVoter::OWN`) and per-shelf ownership through `ShelfVoter` (`ShelfVoter::OWN`); scoped
+actions call `denyAccessUnlessGranted(...)`. `BookVoter` compares owner **by ID** (not object
+identity) so entities served from cache still pass (see **Caching**). Mutating endpoints
+additionally validate a CSRF token (`book_action_<id>`, `delete_book_<id>`, `import_book`,
+`create_shelf`, `settings_profile`, `settings_password`, `settings_delete`); CSRF is
+**session-based** so forms work without JS.
 
 **Library listing.** `LibraryFilter` (readonly DTO) is built from request query params via
 `fromRequest()` and validated/clamped there; it drives `BookRepository::paginateForLibrary()`,
