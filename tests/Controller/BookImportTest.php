@@ -41,4 +41,34 @@ class BookImportTest extends WebTestCase
         self::assertResponseIsSuccessful();
         self::assertStringContainsString('Étranger', (string) $client->getResponse()->getContent());
     }
+
+    public function testXhrImportReturnsJsonAndDoesNotRedirect(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $user = (new User())->setEmail('xhr@example.test')->setDisplayName('Xhr')->setPassword('Secret123');
+        $em->persist($user);
+        $em->flush();
+        $client->loginUser($user);
+
+        $crawler = $client->request('GET', '/livres/recherche?q=camus');
+        $token = $crawler->filter('input[name="_token"]')->first()->attr('value');
+
+        $client->request(
+            'POST',
+            '/books/import',
+            ['volumeId' => 'test-vol-1', '_token' => $token],
+            [],
+            ['HTTP_X-Requested-With' => 'XMLHttpRequest'],
+        );
+
+        self::assertResponseIsSuccessful();
+        self::assertSame('application/json', $client->getResponse()->headers->get('Content-Type'));
+        $payload = json_decode((string) $client->getResponse()->getContent(), true);
+        self::assertTrue($payload['ok']);
+        self::assertSame("L'Étranger", $payload['title']);
+
+        $books = static::getContainer()->get(BookRepository::class)->findBy(['owner' => $user]);
+        self::assertCount(1, $books);
+    }
 }
