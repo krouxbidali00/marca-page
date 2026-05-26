@@ -113,8 +113,10 @@ additionally validate a CSRF token (`book_action_<id>`, `delete_book_<id>`, `imp
 
 **Library listing.** `LibraryFilter` (readonly DTO) is built from request query params via
 `fromRequest()` and validated/clamped there; it drives `BookRepository::paginateForLibrary()`,
-which returns a generic `Page<Book>` value object (page math, ranges, prev/next). `toQueryParams()`
-rebuilds the current filter state for pagination links and "remove this filter" chips.
+which returns a generic `Page<Book>` value object (page math, ranges, prev/next) and is served
+through the tagged `library` cache (keyed by `LibraryFilter::cacheSignature()`; see **Caching**).
+`toQueryParams()` rebuilds the current filter state for pagination links and "remove this
+filter" chips.
 
 **Caching.** Three filesystem pools (`config/packages/cache.yaml`): `cache.google_books`
 (24 h TTL, untagged) and the tag-aware `cache.library` and `cache.book_detail` (1 h TTL each).
@@ -129,10 +131,14 @@ authorization. `HomeController` sets a public `Cache-Control` (`setSharedMaxAge(
 `setMaxAge(600)`) for anonymous visitors.
 
 **Frontend.** AssetMapper + importmap (`importmap.php`) — no JS bundler/build step. Stimulus
-controllers live in `assets/controllers/` (`password-toggle`, `password-strength`, `rating`,
-`notes-autosave`, `book-search` live search). Turbo is enabled (`turbo-core`, eager fetch).
-SCSS is compiled by `symfonycasts/sass-bundle`; **all custom styles live in `assets/styles/*.scss`**
-(partials `@use`d from `app.scss`) — no inline styles in Twig templates. Twig: `templates/base.html.twig`
+controllers live in `assets/controllers/`: `password-toggle`, `password-strength`, `rating`,
+`notes-autosave`, `book-search` (live search), `book-import` (XHR import that keeps you on the
+search page), `library` (filter UI), `shelves`, `settings-profile`, `settings-delete`,
+`stats-chart` (Chart.js wrapper, loaded via importmap), and `csrf_protection`. Turbo is enabled
+(`turbo-core`, eager fetch). SCSS is compiled by `symfonycasts/sass-bundle`; **all custom styles
+live in `assets/styles/*.scss`** (partials `@use`d from `app.scss`) — no inline styles in Twig
+templates. Book descriptions render through the `sanitize_html` Twig filter
+(`symfony/html-sanitizer`); search-result previews use `striptags`. Twig: `templates/base.html.twig`
 is the layout; `templates/_partials/` holds shared fragments (navbars, badges, pagination, stars,
 flash messages); fragment templates prefixed `_` (e.g. `book/_search_results.html.twig`,
 `library/_grid.html.twig`) are rendered for Turbo/AJAX partial updates.
