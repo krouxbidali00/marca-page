@@ -44,7 +44,12 @@ docker compose exec php bin/phpunit --filter testImportAddsBookToLibrary  # one 
 `dama/doctrine-test-bundle` wraps every test in a rolled-back transaction, so the
 test DB is never polluted. Functional tests extend `WebTestCase` and persist their
 own `User` then `$client->loginUser($user)`. In the test env, passwords use the
-`plaintext` hasher (see `config/packages/security.yaml`).
+`plaintext` hasher (see `config/packages/security.yaml`). The tag-aware cache pools
+(`cache.library`, `cache.book_detail`) keep the **filesystem** adapter in the test env
+(`config/packages/test/cache.yaml`) so they survive the `services_resetter` between
+requests — this lets functional tests warm the cache on one request and assert
+invalidation on the next; such tests must `clear()` those pools in `tearDown()`.
+`cache.google_books` uses the `array` adapter there (no cross-request persistence needed).
 
 ## Lint
 
