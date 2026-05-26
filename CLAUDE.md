@@ -79,9 +79,12 @@ consumed directly by Twig.
 
 **Google Books integration.** `GoogleBooksClientInterface` → `GoogleBooksClient` (real
 HTTP client; reads `GOOGLE_BOOKS_API_KEY` env var, falls back to anonymous low-quota
-requests; retries broad queries with an `intitle:` qualifier on 5xx). In the test env
-`services.yaml` swaps in `App\Tests\Double\FakeGoogleBooksClient`. `BookImporter` maps a
-`GoogleBookResult` DTO into a `Book` and dedupes on `(owner, googleVolumeId)`.
+requests; retries broad queries with an `intitle:` qualifier on 5xx; restricts results to
+`GOOGLE_BOOKS_LANG_RESTRICT` via the `langRestrict` param when that env var is non-empty).
+`CachedGoogleBooksClient` decorates it (`#[AsDecorator]`) to cache `search()` / `getVolume()`
+results (see **Caching**). In the test env `services.yaml` swaps in
+`App\Tests\Double\FakeGoogleBooksClient`. `BookImporter` maps a `GoogleBookResult` DTO into a
+`Book` and dedupes on `(owner, googleVolumeId)`.
 `CoverThemePicker` derives a stable theme `0..11` from the title (`crc32 % 12`) so books
 without a thumbnail render a palette-matching CSS cover (`.cover--theme-N`).
 
@@ -103,6 +106,18 @@ endpoints additionally validate a per-book CSRF token (`book_action_<id>`, `dele
 `fromRequest()` and validated/clamped there; it drives `BookRepository::paginateForLibrary()`,
 which returns a generic `Page<Book>` value object (page math, ranges, prev/next). `toQueryParams()`
 rebuilds the current filter state for pagination links and "remove this filter" chips.
+
+**Caching.** Three filesystem pools (`config/packages/cache.yaml`): `cache.google_books`
+(24 h TTL, untagged) and the tag-aware `cache.library` and `cache.book_detail` (1 h TTL each).
+`CachedGoogleBooksClient` caches Google Books `search()` / `getVolume()` (xxh128 keys).
+`BookRepository::paginateForLibrary()` is served through the `library` pool, keyed by
+`LibraryFilter::cacheSignature()` (deterministic, order-insensitive) and tagged
+`user.{id}.library`; `findCachedForDetail()` caches a book's detail tagged `book.{id}`. The
+`LibraryCacheInvalidator` facade (`invalidateLibrary()` / `invalidateBook()`) is called from
+mutating book / shelf / quote actions and on import to drop the relevant tags. `BookVoter`
+compares owner **by ID** (not object identity) so entities served from cache still pass
+authorization. `HomeController` sets a public `Cache-Control` (`setSharedMaxAge(3600)`,
+`setMaxAge(600)`) for anonymous visitors.
 
 **Frontend.** AssetMapper + importmap (`importmap.php`) — no JS bundler/build step. Stimulus
 controllers live in `assets/controllers/` (`password-toggle`, `password-strength`, `rating`,
