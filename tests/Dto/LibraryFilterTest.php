@@ -138,4 +138,16 @@ class LibraryFilterTest extends TestCase
 
         self::assertCount(6, array_unique($signatures), 'each filter axis must alter the signature');
     }
+
+    public function testCacheSignatureEscapesPipeInQuery(): void
+    {
+        $crafted = new LibraryFilter(query: 'hello|sort=evil');
+        $natural = new LibraryFilter(query: 'hello', sort: 'evil');
+
+        self::assertNotSame(
+            $crafted->cacheSignature(),
+            $natural->cacheSignature(),
+            'a pipe in the query must not let one filter masquerade as another',
+        );
+    }
 }

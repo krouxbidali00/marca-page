@@ -126,10 +126,10 @@ final readonly class LibraryFilter
         sort($categories);
 
         return implode('|', [
-            'q=' . $this->query,
+            'q=' . rawurlencode($this->query),
             'reading=' . implode(',', $reading),
             'purchase=' . implode(',', $purchase),
-            'categories=' . implode(',', $categories),
+            'categories=' . implode(',', array_map('rawurlencode', $categories)),
             'minRating=' . ($this->minRating ?? ''),
             'maxPages=' . ($this->maxPages ?? ''),
             'shelf=' . ($this->shelfId ?? ''),
