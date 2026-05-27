@@ -1,4 +1,4 @@
-{# Params: query (string), results (GoogleBookResult[]), error (?string) #}
+{# Params: query (string), results (GoogleBookResult[]), error (?string), ownedVolumeIds (string[]) #}
 {% if error %}
     <div class="alert alert-danger rounded-4 border-0">{{ error }}</div>
 {% endif %}
@@ -24,14 +24,20 @@
                         <div class="text-mute small mb-1">{{ result.authorsLine }}{% if result.publisher %} · {{ result.publisher }}{% endif %}{% if result.publishedYear %} · {{ result.publishedYear }}{% endif %}{% if result.pageCount %} · {{ result.pageCount }} p.{% endif %}</div>
                         {% if result.description %}{% set desc = result.description|striptags %}<p class="text-mute small mb-0">{{ desc|length > 180 ? desc|slice(0, 180) ~ '…' : desc }}</p>{% endif %}
                     </div>
-                    <form method="post" action="{{ path('app_book_import') }}" class="flex-shrink-0"
-                          data-controller="book-import" data-action="submit->book-import#submit">
-                        <input type="hidden" name="_token" value="{{ csrf_token('import_book') }}">
-                        <input type="hidden" name="volumeId" value="{{ result.volumeId }}">
-                        <input type="hidden" name="q" value="{{ query }}">
-                        <button type="submit" class="btn btn-primary rounded-pill px-3 text-nowrap"
-                                data-book-import-target="button"><i class="bi bi-plus-lg me-1"></i> Ajouter</button>
-                    </form>
+                    {% if result.volumeId in ownedVolumeIds %}
+                        <button type="button" class="btn btn-success rounded-pill px-3 text-nowrap flex-shrink-0" disabled>
+                            <i class="bi bi-check-lg me-1"></i> Déjà ajouté
+                        </button>
+                    {% else %}
+                        <form method="post" action="{{ path('app_book_import') }}" class="flex-shrink-0"
+                              data-controller="book-import" data-action="submit->book-import#submit">
+                            <input type="hidden" name="_token" value="{{ csrf_token('import_book') }}">
+                            <input type="hidden" name="volumeId" value="{{ result.volumeId }}">
+                            <input type="hidden" name="q" value="{{ query }}">
+                            <button type="submit" class="btn btn-primary rounded-pill px-3 text-nowrap"
+                                    data-book-import-target="button"><i class="bi bi-plus-lg me-1"></i> Ajouter</button>
+                        </form>
+                    {% endif %}
                 </div>
             </div>
         {% endfor %}
