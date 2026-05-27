@@ -8,7 +8,7 @@
 {% else %}
     <div class="row row-cols-2 row-cols-sm-3 row-cols-md-3 row-cols-xl-4 g-3 g-md-4" data-library-target="grid">
         {% for book in page.items %}
-            <div class="col">{{ include('_partials/book_card.html.twig', {book: book}) }}</div>
+            <div class="col">{{ include('_partials/book_card.html.twig', {book: book, removable: true}) }}</div>
         {% endfor %}
     </div>
 {% endif %}
