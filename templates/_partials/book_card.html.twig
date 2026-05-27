@@ -1,19 +1,30 @@
-{# Library / carousel book card. Params: book (App\Entity\Book), size (cover size, default 'lg') #}
-<a class="book-card text-decoration-none text-ink d-block" href="{{ path('app_book_show', {id: book.id}) }}">
-    <div class="mb-3">
-        {{ include('_partials/book_cover.html.twig', {book: book, size: size|default('lg')}) }}
-    </div>
-    <div class="d-flex justify-content-between align-items-start">
-        <div class="pe-2">
-            <div class="font-serif fs-6 fw-semibold lh-sm">{{ book.title }}</div>
-            <small class="text-mute">{{ book.authorsLine }}</small>
+{# Library / carousel book card. Params: book (App\Entity\Book), size (cover size, default 'lg'), removable (default false) #}
+<div class="book-card-wrap position-relative">
+    <a class="book-card text-decoration-none text-ink d-block" href="{{ path('app_book_show', {id: book.id}) }}">
+        <div class="mb-3">
+            {{ include('_partials/book_cover.html.twig', {book: book, size: size|default('lg')}) }}
         </div>
-        {% if book.rating %}
-            <span class="stars stars--sm text-nowrap"><i class="bi bi-star-fill"></i><small class="ms-1 fw-semibold text-ink">{{ book.rating }}</small></span>
-        {% endif %}
-    </div>
-    <div class="d-flex flex-wrap gap-1 mt-2">
-        {{ include('_partials/reading_status_badge.html.twig', {status: book.readingStatus}) }}
-        {{ include('_partials/purchase_status_badge.html.twig', {status: book.purchaseStatus}) }}
-    </div>
-</a>
+        <div class="d-flex justify-content-between align-items-start">
+            <div class="pe-2">
+                <div class="font-serif fs-6 fw-semibold lh-sm">{{ book.title }}</div>
+                <small class="text-mute">{{ book.authorsLine }}</small>
+            </div>
+            {% if book.rating %}
+                <span class="stars stars--sm text-nowrap"><i class="bi bi-star-fill"></i><small class="ms-1 fw-semibold text-ink">{{ book.rating }}</small></span>
+            {% endif %}
+        </div>
+        <div class="d-flex flex-wrap gap-1 mt-2">
+            {{ include('_partials/reading_status_badge.html.twig', {status: book.readingStatus}) }}
+            {{ include('_partials/purchase_status_badge.html.twig', {status: book.purchaseStatus}) }}
+        </div>
+    </a>
+    {% if removable|default(false) %}
+        <form method="post" action="{{ path('app_book_delete', {id: book.id}) }}" class="book-card-remove"
+              onsubmit="return confirm('Retirer « {{ book.title|e('js') }} » de votre bibliothèque ? Vos notes, citations et votre note seront supprimées.');">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete_book_' ~ book.id) }}">
+            <button type="submit" class="btn btn-sm btn-light rounded-circle shadow-sm" aria-label="Retirer ce livre">
+                <i class="bi bi-trash text-danger"></i>
+            </button>
+        </form>
+    {% endif %}
+</div>
