@@ -123,6 +123,26 @@ class BookRepository extends ServiceEntityRepository
     }
 
     /**
+     * Among the given Google volume IDs, returns those the user already owns.
+     *
+     * @param string[] $volumeIds
+     * @return string[]
+     */
+    public function findOwnedGoogleVolumeIds(User $owner, array $volumeIds): array
+    {
+        if ($volumeIds === []) {
+            return [];
+        }
+
+        return $this->createQueryBuilder('b')
+            ->select('b.googleVolumeId')
+            ->andWhere('b.owner = :owner')->setParameter('owner', $owner)
+            ->andWhere('b.googleVolumeId IN (:ids)')->setParameter('ids', $volumeIds)
+            ->getQuery()
+            ->getSingleColumnResult();
+    }
+
+    /**
      * Other books from the same library that share an author or category, padded
      * with the most recently added books if there aren't enough matches.
      *
