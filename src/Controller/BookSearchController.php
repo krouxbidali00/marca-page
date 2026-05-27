@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Dto\GoogleBookResult;
 use App\Entity\User;
 use App\Repository\BookRepository;
 use App\Service\BookImporter;
@@ -40,7 +41,7 @@ class BookSearchController extends AbstractController
         $user = $this->getUser();
         $ownedVolumeIds = $bookRepository->findOwnedGoogleVolumeIds(
             $user,
-            array_map(static fn ($result) => $result->volumeId, $results),
+            array_map(static fn (GoogleBookResult $result): string => $result->volumeId, $results),
         );
 
         $template = $request->query->getBoolean('fragment')
