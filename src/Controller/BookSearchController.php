@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[IsGranted('ROLE_USER')]
@@ -61,6 +62,7 @@ class BookSearchController extends AbstractController
         Request $request,
         BookImporter $importer,
         LibraryCacheInvalidator $cacheInvalidator,
+        CsrfTokenManagerInterface $csrfTokenManager,
     ): Response {
         if (!$this->isCsrfTokenValid('import_book', (string) $request->request->get('_token'))) {
             throw $this->createAccessDeniedException('Invalid CSRF token.');
@@ -96,7 +98,12 @@ class BookSearchController extends AbstractController
         $cacheInvalidator->invalidateLibrary($user);
 
         if ($isXhr) {
-            return new JsonResponse(['ok' => true, 'title' => $book->getTitle()]);
+            return new JsonResponse([
+                'ok' => true,
+                'id' => $book->getId(),
+                'title' => $book->getTitle(),
+                'deleteToken' => $csrfTokenManager->getToken('delete_book_' . $book->getId())->getValue(),
+            ]);
         }
 
         $this->addFlash('success', \sprintf('« %s » a été ajouté à votre bibliothèque.', $book->getTitle()));

@@ -71,6 +71,9 @@ class BookImportTest extends WebTestCase
         $payload = json_decode((string) $client->getResponse()->getContent(), true);
         self::assertTrue($payload['ok']);
         self::assertSame("L'Étranger", $payload['title']);
+        self::assertIsInt($payload['id']);
+        self::assertGreaterThan(0, $payload['id']);
+        self::assertNotEmpty($payload['deleteToken']);
 
         $books = static::getContainer()->get(BookRepository::class)->findBy(['owner' => $user]);
         self::assertCount(1, $books);
