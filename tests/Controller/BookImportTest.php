@@ -75,4 +75,30 @@ class BookImportTest extends WebTestCase
         $books = static::getContainer()->get(BookRepository::class)->findBy(['owner' => $user]);
         self::assertCount(1, $books);
     }
+
+    public function testSearchMarksAlreadyOwnedResultAsAdded(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $user = (new User())->setEmail('marker@example.test')->setDisplayName('Marker')->setPassword('Secret123');
+        $em->persist($user);
+        $em->flush();
+        $client->loginUser($user);
+
+        // Before import: the result offers the add form.
+        $crawler = $client->request('GET', '/livres/recherche?q=camus');
+        self::assertResponseIsSuccessful();
+        self::assertGreaterThan(0, $crawler->filter('input[name="volumeId"]')->count());
+        self::assertStringNotContainsString('Déjà ajouté', (string) $client->getResponse()->getContent());
+        $token = $crawler->filter('input[name="_token"]')->first()->attr('value');
+
+        // Import the volume returned by the fake Google client.
+        $client->request('POST', '/books/import', ['volumeId' => 'test-vol-1', '_token' => $token]);
+
+        // After import: "Déjà ajouté", and no add form for that result anymore.
+        $crawler = $client->request('GET', '/livres/recherche?q=camus');
+        self::assertResponseIsSuccessful();
+        self::assertStringContainsString('Déjà ajouté', (string) $client->getResponse()->getContent());
+        self::assertSame(0, $crawler->filter('input[name="volumeId"]')->count());
+    }
 }
