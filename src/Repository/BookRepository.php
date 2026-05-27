@@ -123,23 +123,30 @@ class BookRepository extends ServiceEntityRepository
     }
 
     /**
-     * Among the given Google volume IDs, returns those the user already owns.
+     * Maps each owned Google volume ID to its Book id, among the given volume IDs.
      *
      * @param string[] $volumeIds
-     * @return string[]
+     * @return array<string,int> volumeId => bookId
      */
-    public function findOwnedGoogleVolumeIds(User $owner, array $volumeIds): array
+    public function findOwnedBookIdsByVolumeId(User $owner, array $volumeIds): array
     {
         if ($volumeIds === []) {
             return [];
         }
 
-        return $this->createQueryBuilder('b')
-            ->select('b.googleVolumeId')
+        $rows = $this->createQueryBuilder('b')
+            ->select('b.googleVolumeId AS vid, b.id AS id')
             ->andWhere('b.owner = :owner')->setParameter('owner', $owner)
             ->andWhere('b.googleVolumeId IN (:ids)')->setParameter('ids', $volumeIds)
             ->getQuery()
-            ->getSingleColumnResult();
+            ->getResult();
+
+        $map = [];
+        foreach ($rows as $row) {
+            $map[(string) $row['vid']] = (int) $row['id'];
+        }
+
+        return $map;
     }
 
     /**

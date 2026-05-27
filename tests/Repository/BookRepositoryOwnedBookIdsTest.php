@@ -8,24 +8,26 @@ use App\Repository\BookRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class BookRepositoryOwnedVolumeIdsTest extends KernelTestCase
+class BookRepositoryOwnedBookIdsTest extends KernelTestCase
 {
-    public function testReturnsOnlyOwnedVolumeIds(): void
+    public function testMapsOwnedVolumeIdsToBookIds(): void
     {
         $em = static::getContainer()->get(EntityManagerInterface::class);
         $repo = static::getContainer()->get(BookRepository::class);
 
         $user = (new User())->setEmail('owner@example.test')->setDisplayName('Owner')->setPassword('Secret123');
         $em->persist($user);
+        $ids = [];
         foreach (['vol-a', 'vol-b'] as $vid) {
             $book = (new Book())->setOwner($user)->setGoogleVolumeId($vid)->setTitle('T-' . $vid);
             $em->persist($book);
+            $em->flush();
+            $ids[$vid] = $book->getId();
         }
-        $em->flush();
 
-        $owned = $repo->findOwnedGoogleVolumeIds($user, ['vol-a', 'vol-unknown', 'vol-b']);
-        sort($owned);
-        self::assertSame(['vol-a', 'vol-b'], $owned);
+        $map = $repo->findOwnedBookIdsByVolumeId($user, ['vol-a', 'vol-unknown', 'vol-b']);
+
+        self::assertSame(['vol-a' => $ids['vol-a'], 'vol-b' => $ids['vol-b']], $map);
     }
 
     public function testEmptyInputReturnsEmptyArrayWithoutQuery(): void
@@ -33,7 +35,7 @@ class BookRepositoryOwnedVolumeIdsTest extends KernelTestCase
         $repo = static::getContainer()->get(BookRepository::class);
         $user = (new User())->setEmail('empty@example.test')->setDisplayName('Empty')->setPassword('Secret123');
 
-        self::assertSame([], $repo->findOwnedGoogleVolumeIds($user, []));
+        self::assertSame([], $repo->findOwnedBookIdsByVolumeId($user, []));
     }
 
     public function testOnlyReturnsCurrentUsersBooks(): void
@@ -48,6 +50,6 @@ class BookRepositoryOwnedVolumeIdsTest extends KernelTestCase
         $em->persist((new Book())->setOwner($other)->setGoogleVolumeId('vol-x')->setTitle('Other book'));
         $em->flush();
 
-        self::assertSame([], $repo->findOwnedGoogleVolumeIds($owner, ['vol-x']));
+        self::assertSame([], $repo->findOwnedBookIdsByVolumeId($owner, ['vol-x']));
     }
 }

@@ -40,7 +40,7 @@ class BookSearchController extends AbstractController
 
         /** @var User $user */
         $user = $this->getUser();
-        $ownedVolumeIds = $bookRepository->findOwnedGoogleVolumeIds(
+        $ownedBookIds = $bookRepository->findOwnedBookIdsByVolumeId(
             $user,
             array_map(static fn (GoogleBookResult $result): string => $result->volumeId, $results),
         );
@@ -53,7 +53,7 @@ class BookSearchController extends AbstractController
             'query' => $query,
             'results' => $results,
             'error' => $error,
-            'ownedVolumeIds' => $ownedVolumeIds,
+            'ownedBookIds' => $ownedBookIds,
         ]);
     }
 
