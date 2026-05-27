@@ -92,7 +92,7 @@ class LibraryCacheInvalidationTest extends WebTestCase
 
         // Import a book via the search controller (FakeGoogleBooksClient returns L'Étranger)
         $crawler = $client->request('GET', '/livres/recherche?q=camus');
-        $token = $crawler->filter('input[name="_token"]')->first()->attr('value');
+        $token = $crawler->filter('[data-library-toggle-import-token-value]')->first()->attr('data-library-toggle-import-token-value');
         $client->request('POST', '/books/import', ['volumeId' => 'test-vol-1', '_token' => $token]);
         self::assertResponseRedirects();
 
