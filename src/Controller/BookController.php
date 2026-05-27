@@ -12,6 +12,7 @@ use App\Security\BookVoter;
 use App\Service\LibraryCacheInvalidator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -61,6 +62,11 @@ class BookController extends AbstractController
         $em->flush();
 
         $cacheInvalidator->invalidateLibrary($owner);
+
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(['ok' => true]);
+        }
+
         $this->addFlash('success', 'Livre retiré de votre bibliothèque.');
 
         return $this->redirectToRoute('app_library');
