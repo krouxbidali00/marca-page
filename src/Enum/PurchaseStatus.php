@@ -25,4 +25,13 @@ enum PurchaseStatus: string
             self::Lent => 'pill-outline',
         };
     }
+
+    /**
+     * Two-state toggle used by the library card: a bought book becomes "to buy"
+     * again, and any not-yet-bought state (to buy / lent) becomes bought.
+     */
+    public function toggled(): self
+    {
+        return $this === self::Bought ? self::ToBuy : self::Bought;
+    }
 }

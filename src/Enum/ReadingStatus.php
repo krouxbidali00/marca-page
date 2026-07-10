@@ -28,4 +28,13 @@ enum ReadingStatus: string
             self::Abandoned => 'pill-outline',
         };
     }
+
+    /**
+     * Two-state toggle used by the library card: a finished book becomes "to read"
+     * again, and any not-yet-finished state (to read / reading / abandoned) becomes finished.
+     */
+    public function toggled(): self
+    {
+        return $this === self::Finished ? self::ToRead : self::Finished;
+    }
 }
