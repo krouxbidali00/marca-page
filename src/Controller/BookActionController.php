@@ -85,6 +85,7 @@ class BookActionController extends AbstractController
         if ($request->isXmlHttpRequest()) {
             return new JsonResponse([
                 'html' => $this->renderView('_partials/purchase_status_toggle.html.twig', ['book' => $book]),
+                'purchaseStatus' => $book->getPurchaseStatus()->value,
             ]);
         }
 

@@ -42,4 +42,23 @@ class BookCardRemoveTest extends WebTestCase
         self::assertResponseRedirects();
         self::assertCount(0, static::getContainer()->get(BookRepository::class)->findBy(['owner' => $user]));
     }
+
+    public function testLibraryGridRemoveFormUsesConfirmModal(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $user = (new User())->setEmail('gridmodal@example.test')->setDisplayName('GridModal')->setPassword('Secret123');
+        $em->persist($user);
+        $book = (new Book())->setOwner($user)->setGoogleVolumeId('vol-gridmodal-1')->setTitle('Grid Modal Book');
+        $em->persist($book);
+        $em->flush();
+        $client->loginUser($user);
+
+        $crawler = $client->request('GET', '/bibliotheque');
+        self::assertResponseIsSuccessful();
+        $form = $crawler->filter('form.book-card-remove')->first();
+        self::assertSame('confirm', $form->attr('data-controller'));
+        self::assertStringContainsString('submit->confirm#gate', (string) $form->attr('data-action'));
+        self::assertStringNotContainsString('onsubmit', (string) $client->getResponse()->getContent());
+    }
 }

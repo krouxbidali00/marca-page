@@ -31,9 +31,34 @@
             {{ include('_partials/purchase_status_badge.html.twig', {status: book.purchaseStatus}) }}
         </div>
     {% endif %}
+    <div class="book-card-actions">
+        <form method="post" action="{{ path('app_book_purchase', {id: book.id}) }}"
+              class="book-card-action book-card-action--gift" data-action="submit->library#markPurchase">
+            <input type="hidden" name="_token" value="{{ csrf_token('book_action_' ~ book.id) }}">
+            <input type="hidden" name="purchaseStatus" value="{{ book.purchaseStatus.value == 'gifted' ? 'to_buy' : 'gifted' }}">
+            <button type="submit" class="btn btn-sm btn-light rounded-circle shadow-sm {{ book.purchaseStatus.value == 'gifted' ? 'is-active' }}"
+                    aria-label="On me l'a offert" title="On me l'a offert">
+                <i class="bi bi-gift{{ book.purchaseStatus.value == 'gifted' ? '-fill' }}"></i>
+            </button>
+        </form>
+        <form method="post" action="{{ path('app_book_purchase', {id: book.id}) }}"
+              class="book-card-action book-card-action--borrow" data-action="submit->library#markPurchase">
+            <input type="hidden" name="_token" value="{{ csrf_token('book_action_' ~ book.id) }}">
+            <input type="hidden" name="purchaseStatus" value="{{ book.purchaseStatus.value == 'borrowed' ? 'to_buy' : 'borrowed' }}">
+            <button type="submit" class="btn btn-sm btn-light rounded-circle shadow-sm {{ book.purchaseStatus.value == 'borrowed' ? 'is-active' }}"
+                    aria-label="Je l'ai emprunté" title="Je l'ai emprunté">
+                <i class="bi bi-box-arrow-in-down"></i>
+            </button>
+        </form>
+    </div>
     {% if removable|default(false) %}
         <form method="post" action="{{ path('app_book_delete', {id: book.id}) }}" class="book-card-remove"
-              onsubmit="return confirm('Retirer « {{ book.title|e('js') }} » de votre bibliothèque ? Vos notes, citations et votre note seront supprimées.');">
+              data-controller="confirm"
+              data-action="submit->confirm#gate"
+              data-confirm-title-value="Retirer ce livre ?"
+              data-confirm-message-value="Retirer « {{ book.title|e('html_attr') }} » de votre bibliothèque ? Vos notes, citations et votre note seront supprimées."
+              data-confirm-confirm-label-value="Retirer"
+              data-confirm-variant-value="danger">
             <input type="hidden" name="_token" value="{{ csrf_token('delete_book_' ~ book.id) }}">
             <button type="submit" class="btn btn-sm btn-light rounded-circle shadow-sm" aria-label="Retirer ce livre">
                 <i class="bi bi-trash text-danger"></i>
