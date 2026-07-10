@@ -58,7 +58,7 @@ class BookDeleteTest extends WebTestCase
 
         $crawler = $client->request('GET', '/livres/' . $bookId);
         self::assertResponseIsSuccessful();
-        $form = $crawler->filter('form[action$="/delete"]')->first();
+        $form = $crawler->filter('form[action$="/' . $bookId . '/delete"]')->first();
         self::assertSame('confirm', $form->attr('data-controller'));
         self::assertStringContainsString('submit->confirm#gate', (string) $form->attr('data-action'));
         self::assertStringNotContainsString('onsubmit', (string) $client->getResponse()->getContent());

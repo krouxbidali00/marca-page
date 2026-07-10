@@ -8,6 +8,8 @@ import { confirmDialog } from '../confirm.js';
  * the `confirmed` instance flag lets the second, confirmed submit pass through.
  */
 export default class extends Controller {
+    confirmed = false;
+
     static values = {
         title: String,
         message: String,
