@@ -24,6 +24,8 @@ export default class extends Controller {
 
         this.onPopState = () => this.syncFromUrl();
         window.addEventListener('popstate', this.onPopState);
+
+        this.restoreSavedFilters();
     }
 
     disconnect() {
@@ -138,6 +140,20 @@ export default class extends Controller {
         } else {
             localStorage.removeItem(FILTERS_KEY);
         }
+    }
+
+    // On a bare library URL (e.g. navbar navigation), re-apply the last saved
+    // state. An explicit URL — shared link, chip click, back button — always
+    // wins, so we skip when the URL already carries query params.
+    restoreSavedFilters() {
+        if (window.location.search) {
+            return;
+        }
+        const saved = localStorage.getItem(FILTERS_KEY);
+        if (!saved) {
+            return;
+        }
+        this.applyUrl(`${this.urlValue}?${saved}`);
     }
 
     applyUrl(href) {
