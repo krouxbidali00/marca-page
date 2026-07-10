@@ -80,25 +80,31 @@
 }
 
 .book-card-wrap {
-  .book-card-remove {
+  .book-card-remove,
+  .book-card-edit {
     position: absolute;
     top: 0.5rem;
-    right: 0.5rem;
     z-index: 2;
     margin: 0;
     opacity: 0;
     transition: opacity 0.15s ease-in-out;
   }
 
+  .book-card-remove { right: 0.5rem; }
+  .book-card-edit { left: 0.5rem; }
+
   &:hover .book-card-remove,
-  .book-card-remove:focus-within {
+  &:hover .book-card-edit,
+  .book-card-remove:focus-within,
+  .book-card-edit:focus-visible {
     opacity: 1;
   }
 }
 
-// Always show the control where hover is unavailable (touch devices).
+// Always show the controls where hover is unavailable (touch devices).
 @media (hover: none) {
-  .book-card-wrap .book-card-remove {
+  .book-card-wrap .book-card-remove,
+  .book-card-wrap .book-card-edit {
     opacity: 1;
   }
 }
