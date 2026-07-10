@@ -1,0 +1,27 @@
+{# Shared modal to rename a book's title from the library grid.
+   The action URL, CSRF token and current title are injected at open time
+   by the `title-edit` Stimulus controller; submission is intercepted (XHR). #}
+<div class="modal fade" id="bookTitleModal" tabindex="-1" aria-hidden="true"
+     data-title-edit-target="modal">
+    <div class="modal-dialog modal-dialog-centered">
+        <form method="post" action="" class="modal-content rounded-4 border-0 shadow"
+              data-title-edit-target="form"
+              data-action="submit->title-edit#submit">
+            <div class="modal-header border-0">
+                <h5 class="modal-title font-serif fw-semibold">Modifier le titre</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="_token" value="" data-title-edit-target="token">
+                <label for="bookTitleInput" class="form-label">Titre</label>
+                <input type="text" id="bookTitleInput" name="title" class="form-control rounded-pill" maxlength="500" required autocomplete="off"
+                       data-title-edit-target="input">
+                <div class="text-danger small mt-2 d-none" data-title-edit-target="error"></div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-soft rounded-pill" data-bs-dismiss="modal">Annuler</button>
+                <button type="submit" class="btn btn-primary rounded-pill">Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>

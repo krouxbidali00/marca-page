@@ -123,4 +123,23 @@ class BookTitleEditTest extends WebTestCase
         self::assertSame('Titre carte', $trigger->attr('data-title-edit-title-param'));
         self::assertNotEmpty($trigger->attr('data-title-edit-token-param'));
     }
+
+    public function testLibraryPageRendersTitleModal(): void
+    {
+        $client = static::createClient();
+        [$user, ] = $this->persistUserWithBook('title5@example.test', 'vol-title-5', 'Titre modale');
+        $client->loginUser($user);
+
+        $crawler = $client->request('GET', '/bibliotheque');
+        self::assertResponseIsSuccessful();
+
+        // The stable library container also drives the title-edit controller.
+        $container = $crawler->filter('[data-controller*="library"]')->first();
+        self::assertStringContainsString('title-edit', $container->attr('data-controller'));
+
+        // Exactly one shared modal, with the form the controller submits.
+        self::assertSame(1, $crawler->filter('#bookTitleModal')->count());
+        self::assertSame(1, $crawler->filter('#bookTitleModal form[data-title-edit-target="form"]')->count());
+        self::assertSame(1, $crawler->filter('#bookTitleModal input[data-title-edit-target="input"]')->count());
+    }
 }
