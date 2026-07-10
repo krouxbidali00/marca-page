@@ -63,7 +63,13 @@
     </div>
 
     <div class="col-md-6 d-flex align-items-end">
-        <form method="post" action="{{ path('app_book_delete', {id: book.id}) }}" onsubmit="return confirm('Retirer définitivement ce livre de votre bibliothèque ?');">
+        <form method="post" action="{{ path('app_book_delete', {id: book.id}) }}"
+              data-controller="confirm"
+              data-action="submit->confirm#gate"
+              data-confirm-title-value="Retirer ce livre ?"
+              data-confirm-message-value="Retirer définitivement ce livre de votre bibliothèque ?"
+              data-confirm-confirm-label-value="Retirer"
+              data-confirm-variant-value="danger">
             <input type="hidden" name="_token" value="{{ csrf_token('delete_book_' ~ book.id) }}">
             <button type="submit" class="btn btn-link text-danger p-0"><i class="bi bi-trash me-1"></i> Retirer ce livre de ma bibliothèque</button>
         </form>
