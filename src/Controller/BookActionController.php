@@ -68,6 +68,10 @@ class BookActionController extends AbstractController
         $this->cacheInvalidator->invalidateLibrary($book->getOwner());
         $this->cacheInvalidator->invalidateBook($book);
 
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(['purchaseStatus' => $book->getPurchaseStatus()->value]);
+        }
+
         return $this->respond($book, 'Statut d\'achat mis à jour.');
     }
 
