@@ -4,6 +4,10 @@ import { Modal } from 'bootstrap';
  * Shared, promise-based confirmation dialog backed by the #confirm-modal markup
  * rendered once in base.html.twig. Resolves true when the user confirms, false
  * when the modal is dismissed (cancel / Escape / backdrop).
+ *
+ * Single-in-flight: it drives one shared modal, so callers must not open a second
+ * dialog while one is pending. The UI already enforces this (Bootstrap's backdrop
+ * blocks interaction while the modal is open).
  */
 export function confirmDialog({ title = '', message = '', confirmLabel = 'Confirmer', variant = 'danger' } = {}) {
     const modalEl = document.getElementById('confirm-modal');
@@ -29,6 +33,9 @@ export function confirmDialog({ title = '', message = '', confirmLabel = 'Confir
         confirmBtn.addEventListener('click', onConfirm, { once: true });
 
         modalEl.addEventListener('hidden.bs.modal', () => {
+            // Drop the unfired confirm listener on the dismiss path (on the confirm
+            // path { once: true } has already detached it — this keeps repeated
+            // cancels from accumulating listeners on the shared modal).
             confirmBtn.removeEventListener('click', onConfirm);
             resolve(confirmed);
         }, { once: true });
