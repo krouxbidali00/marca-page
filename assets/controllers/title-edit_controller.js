@@ -24,6 +24,7 @@ export default class extends Controller {
 
     async submit(event) {
         event.preventDefault();
+        const titleEl = this.titleEl;
         this.hideError();
         try {
             const res = await fetch(this.formTarget.action, {
@@ -40,8 +41,8 @@ export default class extends Controller {
                 throw new Error('http-' + res.status);
             }
             const data = await res.json();
-            if (this.titleEl) {
-                this.titleEl.textContent = data.title;
+            if (titleEl) {
+                titleEl.textContent = data.title;
             }
             Modal.getOrCreateInstance(this.modalTarget).hide();
         } catch (e) {
