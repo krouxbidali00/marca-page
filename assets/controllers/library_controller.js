@@ -1,5 +1,9 @@
 import { Controller } from '@hotwired/stimulus';
 
+// Persisted library view state (search + filters + sort, minus pagination),
+// remembered across navigation until the user resets. Sibling to 'library-view'.
+const FILTERS_KEY = 'library-filters';
+
 /* Owns library page state: search, filters, sort, pagination, grid/list view.
    One XHR loop refreshes the results fragment on any change. */
 export default class extends Controller {
@@ -116,9 +120,24 @@ export default class extends Controller {
     // --- Core ---
 
     refresh() {
+        this.saveState();
         const params = this.buildParams();
         const url = params.toString() ? `${this.urlValue}?${params}` : this.urlValue;
         this.fetchAndReplace(url, true);
+    }
+
+    // Persist current state (minus page) so it survives navigation. Empty state
+    // removes the key, which is exactly what both reset paths produce — so
+    // "Tout effacer" and the "Réinitialiser" chip clear the preference for free.
+    saveState() {
+        const params = this.buildParams();
+        params.delete('page');
+        const qs = params.toString();
+        if (qs) {
+            localStorage.setItem(FILTERS_KEY, qs);
+        } else {
+            localStorage.removeItem(FILTERS_KEY);
+        }
     }
 
     applyUrl(href) {
@@ -129,6 +148,7 @@ export default class extends Controller {
         this.currentSort = url.searchParams.get('sort') || 'recent';
         this.currentPage = parseInt(url.searchParams.get('page') || '1', 10);
         this.updateSortLabel();
+        this.saveState();
         this.fetchAndReplace(href, true);
     }
 
