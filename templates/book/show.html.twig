@@ -41,6 +41,20 @@
                             {% if book.purchaseStatus.value == 'bought' %}<i class="bi bi-bag-check-fill fs-5"></i> Acheté{% else %}<i class="bi bi-bag-heart fs-5"></i> J'ai acheté ce livre{% endif %}
                         </button>
                     </form>
+                    <form method="post" action="{{ path('app_book_purchase', {id: book.id}) }}">
+                        <input type="hidden" name="_token" value="{{ action_token }}">
+                        <input type="hidden" name="purchaseStatus" value="{{ book.purchaseStatus.value == 'gifted' ? 'to_buy' : 'gifted' }}">
+                        <button type="submit" class="btn {{ book.purchaseStatus.value == 'gifted' ? 'is-active' : 'btn-outline-primary' }} rounded-pill fw-medium w-100 d-flex align-items-center justify-content-center gap-2">
+                            {% if book.purchaseStatus.value == 'gifted' %}<i class="bi bi-gift-fill fs-5"></i> Offert{% else %}<i class="bi bi-gift fs-5"></i> On me l'a offert{% endif %}
+                        </button>
+                    </form>
+                    <form method="post" action="{{ path('app_book_purchase', {id: book.id}) }}">
+                        <input type="hidden" name="_token" value="{{ action_token }}">
+                        <input type="hidden" name="purchaseStatus" value="{{ book.purchaseStatus.value == 'borrowed' ? 'to_buy' : 'borrowed' }}">
+                        <button type="submit" class="btn {{ book.purchaseStatus.value == 'borrowed' ? 'is-active' : 'btn-outline-primary' }} rounded-pill fw-medium w-100 d-flex align-items-center justify-content-center gap-2">
+                            {% if book.purchaseStatus.value == 'borrowed' %}<i class="bi bi-box-arrow-in-down fs-5"></i> Emprunté{% else %}<i class="bi bi-box-arrow-in-down fs-5"></i> Je l'ai emprunté{% endif %}
+                        </button>
+                    </form>
                 </div>
 
                 <div class="row g-2 detail-aside-block">
