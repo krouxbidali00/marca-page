@@ -20,7 +20,12 @@
     </a>
     {% if removable|default(false) %}
         <form method="post" action="{{ path('app_book_delete', {id: book.id}) }}" class="book-card-remove"
-              onsubmit="return confirm('Retirer « {{ book.title|e('js') }} » de votre bibliothèque ? Vos notes, citations et votre note seront supprimées.');">
+              data-controller="confirm"
+              data-action="submit->confirm#gate"
+              data-confirm-title-value="Retirer ce livre ?"
+              data-confirm-message-value="Retirer « {{ book.title|e('html_attr') }} » de votre bibliothèque ? Vos notes, citations et votre note seront supprimées."
+              data-confirm-confirm-label-value="Retirer"
+              data-confirm-variant-value="danger">
             <input type="hidden" name="_token" value="{{ csrf_token('delete_book_' ~ book.id) }}">
             <button type="submit" class="btn btn-sm btn-light rounded-circle shadow-sm" aria-label="Retirer ce livre">
                 <i class="bi bi-trash text-danger"></i>
