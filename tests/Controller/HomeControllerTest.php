@@ -33,4 +33,14 @@ class HomeControllerTest extends WebTestCase
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('input[name="registration_form[email]"]');
     }
+
+    public function testConfirmModalIsRendered(): void
+    {
+        $client = static::createClient();
+        $client->request('GET', '/');
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('#confirm-modal');
+        self::assertSelectorExists('#confirm-modal-confirm');
+    }
 }
