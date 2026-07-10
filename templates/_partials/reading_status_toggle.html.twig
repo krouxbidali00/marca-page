@@ -3,7 +3,7 @@
 {% set status = book.readingStatus %}
 <button type="button" class="pill pill--toggle {{ status.pillClass }}"
         data-status-toggle-target="pill"
-        data-action="click->status-toggle#toggle"
+        data-action="status-toggle#toggle"
         data-status-toggle-url-param="{{ path('app_book_reading_progress', {id: book.id}) }}"
         aria-label="Changer le statut de lecture (actuellement : {{ status.label }})">
     {% if status.value == 'reading' %}<span class="pill-dot"></span>{% else %}<i class="bi bi-bookmark"></i>{% endif %}
