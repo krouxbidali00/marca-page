@@ -1,4 +1,5 @@
 import { Controller } from '@hotwired/stimulus';
+import { confirmDialog } from '../confirm.js';
 
 /*
  * Toggles a search result between "add to library" and "in library / remove",
@@ -43,7 +44,13 @@ export default class extends Controller {
 
     async remove(event) {
         event.preventDefault();
-        if (!window.confirm('Retirer ce livre de votre bibliothèque ? Vos notes, citations et votre note seront supprimées.')) {
+        const confirmed = await confirmDialog({
+            title: 'Retirer ce livre ?',
+            message: 'Vos notes, citations et votre note seront supprimées.',
+            confirmLabel: 'Retirer',
+            variant: 'danger',
+        });
+        if (!confirmed) {
             return;
         }
         this.setPending(this.removeTarget, 'Retrait…');
