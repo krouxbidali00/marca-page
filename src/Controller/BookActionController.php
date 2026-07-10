@@ -32,9 +32,13 @@ class BookActionController extends AbstractController
     {
         $this->guard($book, $request);
 
-        $status = ReadingStatus::tryFrom((string) $request->request->get('readingStatus', ''));
-        if ($status !== null) {
-            $book->setReadingStatus($status);
+        if ($request->request->getBoolean('toggle')) {
+            $book->setReadingStatus($book->getReadingStatus()->toggled());
+        } else {
+            $status = ReadingStatus::tryFrom((string) $request->request->get('readingStatus', ''));
+            if ($status !== null) {
+                $book->setReadingStatus($status);
+            }
         }
         if ($request->request->has('currentPage')) {
             $page = $request->request->get('currentPage');
@@ -44,6 +48,12 @@ class BookActionController extends AbstractController
         $this->cacheInvalidator->invalidateLibrary($book->getOwner());
         $this->cacheInvalidator->invalidateBook($book);
 
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse([
+                'html' => $this->renderView('_partials/reading_status_toggle.html.twig', ['book' => $book]),
+            ]);
+        }
+
         return $this->respond($book, 'Progression mise à jour.');
     }
 
@@ -52,9 +62,13 @@ class BookActionController extends AbstractController
     {
         $this->guard($book, $request);
 
-        $status = PurchaseStatus::tryFrom((string) $request->request->get('purchaseStatus', ''));
-        if ($status !== null) {
-            $book->setPurchaseStatus($status);
+        if ($request->request->getBoolean('toggle')) {
+            $book->setPurchaseStatus($book->getPurchaseStatus()->toggled());
+        } else {
+            $status = PurchaseStatus::tryFrom((string) $request->request->get('purchaseStatus', ''));
+            if ($status !== null) {
+                $book->setPurchaseStatus($status);
+            }
         }
         if ($request->request->has('purchaseFormat')) {
             $format = trim((string) $request->request->get('purchaseFormat', ''));
@@ -67,6 +81,12 @@ class BookActionController extends AbstractController
         $this->em->flush();
         $this->cacheInvalidator->invalidateLibrary($book->getOwner());
         $this->cacheInvalidator->invalidateBook($book);
+
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse([
+                'html' => $this->renderView('_partials/purchase_status_toggle.html.twig', ['book' => $book]),
+            ]);
+        }
 
         return $this->respond($book, 'Statut d\'achat mis à jour.');
     }
