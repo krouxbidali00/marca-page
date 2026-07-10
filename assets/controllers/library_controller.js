@@ -66,6 +66,26 @@ export default class extends Controller {
         this.refresh();
     }
 
+    // Card quick-action: mark a book gifted/borrowed via XHR, then refresh the
+    // filtered list so it disappears when it no longer matches the active filter.
+    async markPurchase(event) {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const button = form.querySelector('button');
+        if (button) button.disabled = true;
+        try {
+            const res = await fetch(form.action, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: new FormData(form),
+            });
+            if (!res.ok) throw new Error('http-' + res.status);
+            this.refresh();
+        } catch (e) {
+            if (button) button.disabled = false;
+        }
+    }
+
     setView(event) {
         this.viewMode = event.currentTarget.dataset.view;
         localStorage.setItem('library-view', this.viewMode);

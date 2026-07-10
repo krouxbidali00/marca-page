@@ -102,3 +102,35 @@
     opacity: 1;
   }
 }
+
+// Quick purchase-action buttons overlaid on library cards (top-left, opposite
+// the remove button), revealed on hover like `.book-card-remove`.
+.book-card-wrap {
+  .book-card-actions {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    z-index: 2;
+    display: flex;
+    gap: 0.35rem;
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
+
+    form { margin: 0; }
+  }
+
+  .book-card-action--gift .btn.is-active { background: var(--peche); }
+  .book-card-action--borrow .btn.is-active { background: var(--lavande); }
+
+  &:hover .book-card-actions,
+  .book-card-actions:focus-within {
+    opacity: 1;
+  }
+}
+
+// Always show the controls where hover is unavailable (touch devices).
+@media (hover: none) {
+  .book-card-wrap .book-card-actions {
+    opacity: 1;
+  }
+}
