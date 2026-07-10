@@ -1,6 +1,7 @@
 // The whole card lifts as one unit on hover. The status row lives outside the
 // <a class="book-card">, so the lift + cover shadow are driven from the wrap.
-.book-card-wrap {
+.book-card-wrap,
+.carousel-card {
   transition: transform .25s ease, box-shadow .25s ease;
 
   &:hover {
@@ -120,8 +121,6 @@
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
-  position: relative;
-  z-index: 2; // sit above the card link's hover treatment
   transition: filter .15s ease, opacity .15s ease, outline-color .15s ease;
 
   &:hover { filter: brightness(0.97); }

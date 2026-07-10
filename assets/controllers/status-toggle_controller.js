@@ -7,7 +7,6 @@ import { Controller } from '@hotwired/stimulus';
  * The flip rule and the pill markup both live on the server — never duplicated here.
  */
 export default class extends Controller {
-    static targets = ['pill'];
     static values = { token: String };
 
     async toggle(event) {
@@ -34,7 +33,11 @@ export default class extends Controller {
             const data = await res.json();
             // Swap the pill; Stimulus rebinds the action/target on the new node,
             // and the token value stays on the (unchanged) controller element.
+            const hadFocus = document.activeElement === button;
             button.outerHTML = data.html;
+            if (hadFocus) {
+                this.element.querySelector(`[data-status-toggle-url-param="${url}"]`)?.focus();
+            }
         } catch (e) {
             button.disabled = false;
             button.classList.remove('is-pending');

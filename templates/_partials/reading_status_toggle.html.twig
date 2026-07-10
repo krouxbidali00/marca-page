@@ -2,7 +2,6 @@
    Rendered inside a status-toggle controller; re-rendered server-side after each toggle. #}
 {% set status = book.readingStatus %}
 <button type="button" class="pill pill--toggle {{ status.pillClass }}"
-        data-status-toggle-target="pill"
         data-action="status-toggle#toggle"
         data-status-toggle-url-param="{{ path('app_book_reading_progress', {id: book.id}) }}"
         aria-label="Changer le statut de lecture (actuellement : {{ status.label }})">
