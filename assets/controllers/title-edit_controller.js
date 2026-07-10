@@ -8,7 +8,7 @@ import { Modal } from 'bootstrap';
  * back into the originating card without a page reload.
  */
 export default class extends Controller {
-    static targets = ['modal', 'form', 'input', 'token', 'error'];
+    static targets = ['modal', 'form', 'input', 'token', 'error', 'submitButton'];
 
     open(event) {
         const { id, title, token } = event.params;
@@ -26,6 +26,7 @@ export default class extends Controller {
         event.preventDefault();
         const titleEl = this.titleEl;
         this.hideError();
+        this.submitButtonTarget.disabled = true;
         try {
             const res = await fetch(this.formTarget.action, {
                 method: 'POST',
@@ -47,6 +48,8 @@ export default class extends Controller {
             Modal.getOrCreateInstance(this.modalTarget).hide();
         } catch (e) {
             this.showError('Une erreur est survenue. Réessayez.');
+        } finally {
+            this.submitButtonTarget.disabled = false;
         }
     }
 
