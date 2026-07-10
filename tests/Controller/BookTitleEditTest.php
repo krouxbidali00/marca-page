@@ -103,4 +103,24 @@ class BookTitleEditTest extends WebTestCase
         self::assertResponseStatusCodeSame(403);
         self::assertSame('Titre initial', $this->freshTitle($bookId));
     }
+
+    public function testGridRendersEditTrigger(): void
+    {
+        $client = static::createClient();
+        [$user, $bookId] = $this->persistUserWithBook('title4@example.test', 'vol-title-4', 'Titre carte');
+        $client->loginUser($user);
+
+        $crawler = $client->request('GET', '/bibliotheque');
+        self::assertResponseIsSuccessful();
+
+        // Title node is marked for in-place updates.
+        self::assertStringContainsString('Titre carte', $crawler->filter('[data-book-title]')->first()->text());
+
+        // The card exposes a pencil trigger wired to the title-edit controller.
+        $trigger = $crawler->filter('button[data-action~="title-edit#open"]');
+        self::assertSame(1, $trigger->count());
+        self::assertSame((string) $bookId, $trigger->attr('data-title-edit-id-param'));
+        self::assertSame('Titre carte', $trigger->attr('data-title-edit-title-param'));
+        self::assertNotEmpty($trigger->attr('data-title-edit-token-param'));
+    }
 }
