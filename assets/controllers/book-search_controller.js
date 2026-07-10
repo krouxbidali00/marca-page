@@ -23,6 +23,7 @@ export default class extends Controller {
             event.preventDefault();
         }
         const q = this.inputTarget.value.trim();
+        this.syncUrl(q);
         try {
             const res = await fetch(`${this.urlValue}?fragment=1&q=${encodeURIComponent(q)}`, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' },
@@ -31,5 +32,16 @@ export default class extends Controller {
         } catch (e) {
             // Keep whatever was rendered server-side.
         }
+    }
+
+    /* Keep the address bar in sync so a refresh restores the last search. */
+    syncUrl(q) {
+        const url = new URL(window.location);
+        if (q === '') {
+            url.searchParams.delete('q');
+        } else {
+            url.searchParams.set('q', q);
+        }
+        window.history.replaceState({}, '', url);
     }
 }
