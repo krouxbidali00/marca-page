@@ -243,4 +243,43 @@ class LibraryStatusToggleTest extends WebTestCase
         $client->request('GET', '/bibliotheque');
         self::assertStringContainsString('actuellement : Terminé', (string) $client->getResponse()->getContent());
     }
+
+    public function testCardRendersToggleButtonsOutsideTheLink(): void
+    {
+        $client = static::createClient();
+        [$user, ] = $this->persistUserWithBook('card1@example.test', 'vol-card-1', ReadingStatus::ToRead, PurchaseStatus::ToBuy);
+        $client->loginUser($user);
+
+        $crawler = $client->request('GET', '/bibliotheque');
+        self::assertResponseIsSuccessful();
+
+        // Two toggle pills per card, wired to the controller.
+        self::assertSame(2, $crawler->filter('button.pill--toggle[data-action~="status-toggle#toggle"]')->count());
+
+        // They must NOT sit inside the navigational <a> (a button in <a> is invalid + would navigate).
+        self::assertSame(0, $crawler->filter('a.book-card button.pill--toggle')->count());
+
+        // The status row is a status-toggle controller carrying the CSRF token.
+        $row = $crawler->filter('.book-card-status[data-controller="status-toggle"]');
+        self::assertSame(1, $row->count());
+        self::assertNotEmpty($row->attr('data-status-toggle-token-value'));
+
+        // Each pill points at its own action route.
+        $urls = $crawler->filter('button.pill--toggle')->each(fn ($n) => $n->attr('data-status-toggle-url-param'));
+        self::assertTrue((bool) array_filter($urls, fn ($u) => str_contains((string) $u, '/reading-progress')));
+        self::assertTrue((bool) array_filter($urls, fn ($u) => str_contains((string) $u, '/purchase')));
+    }
+
+    public function testCardStillRendersTitleEditPencil(): void
+    {
+        $client = static::createClient();
+        [$user, ] = $this->persistUserWithBook('card2@example.test', 'vol-card-2');
+        $client->loginUser($user);
+
+        $crawler = $client->request('GET', '/bibliotheque');
+        self::assertResponseIsSuccessful();
+
+        // Non-regression: the title-edit pencil is untouched.
+        self::assertSame(1, $crawler->filter('button[data-action~="title-edit#open"]')->count());
+    }
 }

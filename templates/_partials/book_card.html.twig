@@ -1,4 +1,8 @@
-{# Library book card. Params: book (App\Entity\Book), size (cover size, default 'lg'), removable (default false), editable (default false) #}
+{# Library book card. Params: book (App\Entity\Book), size (cover size, default 'lg'),
+   removable (default false), editable (default false).
+   When editable, the status pills are toggle buttons (status-toggle controller) and a
+   title-edit pencil is shown. The status row lives OUTSIDE the <a> so its buttons are
+   valid HTML and don't trigger navigation. #}
 <div class="book-card-wrap position-relative">
     <a class="book-card text-decoration-none text-ink d-block" href="{{ path('app_book_show', {id: book.id}) }}">
         <div class="mb-3">
@@ -13,11 +17,20 @@
                 <span class="stars stars--sm text-nowrap"><i class="bi bi-star-fill"></i><small class="ms-1 fw-semibold text-ink">{{ book.rating }}</small></span>
             {% endif %}
         </div>
-        <div class="d-flex flex-wrap gap-1 mt-2">
+    </a>
+    {% if editable|default(false) %}
+        <div class="book-card-status d-flex flex-wrap gap-1 mt-2"
+             data-controller="status-toggle"
+             data-status-toggle-token-value="{{ csrf_token('book_action_' ~ book.id) }}">
+            {{ include('_partials/reading_status_toggle.html.twig', {book: book}) }}
+            {{ include('_partials/purchase_status_toggle.html.twig', {book: book}) }}
+        </div>
+    {% else %}
+        <div class="book-card-status d-flex flex-wrap gap-1 mt-2">
             {{ include('_partials/reading_status_badge.html.twig', {status: book.readingStatus}) }}
             {{ include('_partials/purchase_status_badge.html.twig', {status: book.purchaseStatus}) }}
         </div>
-    </a>
+    {% endif %}
     {% if removable|default(false) %}
         <form method="post" action="{{ path('app_book_delete', {id: book.id}) }}" class="book-card-remove"
               onsubmit="return confirm('Retirer « {{ book.title|e('js') }} » de votre bibliothèque ? Vos notes, citations et votre note seront supprimées.');">
