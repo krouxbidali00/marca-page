@@ -126,6 +126,32 @@ class BookActionController extends AbstractController
         return $this->respond($book, 'Étagère mise à jour.');
     }
 
+    #[Route('/title', name: 'app_book_title')]
+    public function title(Book $book, Request $request): Response
+    {
+        $this->guard($book, $request);
+
+        $title = trim((string) $request->request->get('title', ''));
+        if ($title === '') {
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse(['error' => 'Le titre ne peut pas être vide.'], Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+
+            return $this->respondError($book, 'Le titre ne peut pas être vide.');
+        }
+
+        $book->setTitle(mb_substr($title, 0, 500));
+        $this->em->flush();
+        $this->cacheInvalidator->invalidateLibrary($book->getOwner());
+        $this->cacheInvalidator->invalidateBook($book);
+
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(['title' => $book->getTitle()]);
+        }
+
+        return $this->respond($book, 'Titre mis à jour.');
+    }
+
     private function guard(Book $book, Request $request): void
     {
         $this->denyAccessUnlessGranted(BookVoter::OWN, $book);
@@ -138,6 +164,13 @@ class BookActionController extends AbstractController
     private function respond(Book $book, string $message): Response
     {
         $this->addFlash('success', $message);
+
+        return $this->redirectToRoute('app_book_show', ['id' => $book->getId()]);
+    }
+
+    private function respondError(Book $book, string $message): Response
+    {
+        $this->addFlash('error', $message);
 
         return $this->redirectToRoute('app_book_show', ['id' => $book->getId()]);
     }
