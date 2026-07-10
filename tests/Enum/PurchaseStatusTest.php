@@ -7,6 +7,31 @@ use PHPUnit\Framework\TestCase;
 
 class PurchaseStatusTest extends TestCase
 {
+    public function testToggledFromBoughtGoesToBuy(): void
+    {
+        self::assertSame(PurchaseStatus::ToBuy, PurchaseStatus::Bought->toggled());
+    }
+
+    public function testToggledFromToBuyGoesBought(): void
+    {
+        self::assertSame(PurchaseStatus::Bought, PurchaseStatus::ToBuy->toggled());
+    }
+
+    public function testToggledFromLentGoesBought(): void
+    {
+        self::assertSame(PurchaseStatus::Bought, PurchaseStatus::Lent->toggled());
+    }
+
+    public function testToggledFromGiftedGoesBought(): void
+    {
+        self::assertSame(PurchaseStatus::Bought, PurchaseStatus::Gifted->toggled());
+    }
+
+    public function testToggledFromBorrowedGoesBought(): void
+    {
+        self::assertSame(PurchaseStatus::Bought, PurchaseStatus::Borrowed->toggled());
+    }
+
     public function testGiftedLabelAndPill(): void
     {
         self::assertSame('gifted', PurchaseStatus::Gifted->value);

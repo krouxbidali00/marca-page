@@ -1,0 +1,10 @@
+{# Clickable purchase-status pill for the library card. Params: book (App\Entity\Book).
+   Rendered inside a status-toggle controller; re-rendered server-side after each toggle. #}
+{% set status = book.purchaseStatus %}
+<button type="button" class="pill pill--toggle {{ status.pillClass }}"
+        data-action="status-toggle#toggle"
+        data-status-toggle-url-param="{{ path('app_book_purchase', {id: book.id}) }}"
+        aria-label="Changer le statut d'achat (actuellement : {{ status.label }})">
+    {% if status.value == 'bought' %}<i class="bi bi-bag-check-fill"></i>{% elseif status.value == 'lent' %}<i class="bi bi-arrow-left-right"></i>{% else %}<i class="bi bi-bag-heart"></i>{% endif %}
+    {{ status.label }}
+</button>

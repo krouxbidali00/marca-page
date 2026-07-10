@@ -1,4 +1,7 @@
-.book-card {
+// The whole card lifts as one unit on hover. The status row lives outside the
+// <a class="book-card">, so the lift + cover shadow are driven from the wrap.
+.book-card-wrap,
+.carousel-card {
   transition: transform .25s ease, box-shadow .25s ease;
 
   &:hover {
@@ -66,16 +69,16 @@
     }
 
     .stars--sm small { font-size: 0.7rem; }
+  }
 
-    .pill {
-      font-size: 0.65rem;
-      padding: 0.2rem 0.5rem;
-      gap: 0.25rem;
+  .book-card-wrap .pill {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
+    gap: 0.25rem;
 
-      .pill-dot { width: 5px; height: 5px; }
+    .pill-dot { width: 5px; height: 5px; }
 
-      i { font-size: 0.7rem; }
-    }
+    i { font-size: 0.7rem; }
   }
 }
 
@@ -107,6 +110,29 @@
   .book-card-wrap .book-card-edit {
     opacity: 1;
   }
+}
+
+// Clickable status pill on library cards. Neutralise the <button> UA look so it
+// matches the read-only pill; pill-* still supplies the background/colour, and
+// pill-outline (loaded after book-card in app.scss) keeps its own border.
+.pill--toggle {
+  border: 1px solid transparent;
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: filter .15s ease, opacity .15s ease, outline-color .15s ease;
+
+  &:hover { filter: brightness(0.97); }
+  &:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  &.is-pending { opacity: .55; cursor: default; }
+  &.is-error { outline: 2px solid #d9534f; outline-offset: 2px; }
+}
+
+// List view: the status row is outside the flexed .book-card, so align the pills
+// under the title column (cover is 80px + 1rem gap) rather than under the cover.
+.view--list .book-card-status {
+  padding-left: calc(80px + 1rem);
 }
 
 // Quick purchase-action buttons (gift / borrow) overlaid on library cards,
