@@ -1,5 +1,5 @@
 {# Params: status (App\Enum\PurchaseStatus), book (optional — adds format/date for "Acheté") #}
 <span class="pill {{ status.pillClass }}">
-    {% if status.value == 'bought' %}<i class="bi bi-bag-check-fill"></i>{% elseif status.value == 'lent' %}<i class="bi bi-arrow-left-right"></i>{% else %}<i class="bi bi-bag-heart"></i>{% endif %}
+    {% if status.value == 'bought' %}<i class="bi bi-bag-check-fill"></i>{% elseif status.value == 'lent' %}<i class="bi bi-arrow-left-right"></i>{% elseif status.value == 'gifted' %}<i class="bi bi-gift"></i>{% elseif status.value == 'borrowed' %}<i class="bi bi-box-arrow-in-down"></i>{% else %}<i class="bi bi-bag-heart"></i>{% endif %}
     {{ status.label }}{% if book is defined and status.value == 'bought' %}{% if book.purchaseFormat %} · {{ book.purchaseFormat }}{% endif %}{% if book.purchasedAt %} · {{ book.purchasedAt|date('M Y') }}{% endif %}{% endif %}
 </span>

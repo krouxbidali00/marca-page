@@ -108,3 +108,38 @@
     opacity: 1;
   }
 }
+
+// Quick purchase-action buttons (gift / borrow) overlaid on library cards,
+// stacked in a column at the top-left BELOW the edit button so the two
+// overlays never overlap (remove sits top-right, edit top-left). Revealed on
+// hover like the other card controls.
+.book-card-wrap {
+  .book-card-actions {
+    position: absolute;
+    top: 2.9rem; // clears the edit button above (top: 0.5rem, ~2rem tall)
+    left: 0.5rem;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    opacity: 0;
+    transition: opacity 0.15s ease-in-out;
+
+    form { margin: 0; }
+  }
+
+  .book-card-action--gift .btn.is-active { background: var(--peche); }
+  .book-card-action--borrow .btn.is-active { background: var(--lavande); }
+
+  &:hover .book-card-actions,
+  .book-card-actions:focus-within {
+    opacity: 1;
+  }
+}
+
+// Always show the controls where hover is unavailable (touch devices).
+@media (hover: none) {
+  .book-card-wrap .book-card-actions {
+    opacity: 1;
+  }
+}
