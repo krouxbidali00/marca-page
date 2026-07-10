@@ -341,4 +341,21 @@ class SettingsControllerTest extends WebTestCase
         $stillMe = $em->getRepository(User::class)->findOneBy(['email' => 'me-uniq@example.test']);
         self::assertNotNull($stillMe, 'Current user email must remain unchanged when target is already in use');
     }
+
+    public function testAccountDeletionFormUsesConfirmModal(): void
+    {
+        $client = static::createClient();
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $user = (new User())->setEmail('del@example.test')->setDisplayName('Del')->setPassword('Secret123');
+        $em->persist($user);
+        $em->flush();
+        $client->loginUser($user);
+
+        $crawler = $client->request('GET', '/parametres');
+        self::assertResponseIsSuccessful();
+        $form = $crawler->filter('form.settings-card--danger')->first();
+        self::assertSame('confirm', $form->attr('data-controller'));
+        self::assertStringContainsString('submit->confirm#gate', (string) $form->attr('data-action'));
+        self::assertStringNotContainsString('settings-delete', (string) $client->getResponse()->getContent());
+    }
 }

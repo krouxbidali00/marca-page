@@ -1,7 +1,11 @@
 <form method="post" action="{{ path('app_settings_delete') }}"
       class="settings-card settings-card--danger"
-      data-controller="settings-delete"
-      data-action="submit->settings-delete#confirm">
+      data-controller="confirm"
+      data-action="submit->confirm#gate"
+      data-confirm-title-value="Supprimer votre compte ?"
+      data-confirm-message-value="Cette action est définitive et supprimera tous vos livres, citations et étagères."
+      data-confirm-confirm-label-value="Supprimer mon compte"
+      data-confirm-variant-value="danger">
     <h2>Zone dangereuse</h2>
     <p class="text-mute">La suppression de votre compte est <strong>définitive</strong>. Tous vos livres, citations et étagères seront perdus.</p>
     <input type="hidden" name="_token" value="{{ csrf_token('settings_delete') }}">
