@@ -135,10 +135,16 @@ export default class extends Controller {
         const params = this.buildParams();
         params.delete('page');
         const qs = params.toString();
-        if (qs) {
-            localStorage.setItem(FILTERS_KEY, qs);
-        } else {
-            localStorage.removeItem(FILTERS_KEY);
+        // Persistence is best-effort: a storage failure (quota, disabled
+        // storage, private mode) must never abort the refresh/apply that follows.
+        try {
+            if (qs) {
+                localStorage.setItem(FILTERS_KEY, qs);
+            } else {
+                localStorage.removeItem(FILTERS_KEY);
+            }
+        } catch (e) {
+            // Storage unavailable — skip persistence this cycle.
         }
     }
 
@@ -149,7 +155,12 @@ export default class extends Controller {
         if (window.location.search) {
             return;
         }
-        const saved = localStorage.getItem(FILTERS_KEY);
+        let saved = null;
+        try {
+            saved = localStorage.getItem(FILTERS_KEY);
+        } catch (e) {
+            // Storage unavailable — nothing to restore.
+        }
         if (!saved) {
             return;
         }
